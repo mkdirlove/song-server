@@ -57,12 +57,10 @@ class DbHelper:
     Songs Db
     """
 
-    def get_songs(self, page_number=1, explicit_query=False, artists=None):
+    def get_songs(self, page_number=1, explicit_query=False):
 
-        artist_filter = {} if artists is None else \
-            {'artists': {'$elemMatch': {'name': {'$in': artists}}}}
         explicit_query = {'is_explicit': {'$ne': True}} if explicit_query else {}
-        find_query = {**artist_filter, **explicit_query}
+        find_query = {**explicit_query}
 
         return self._execute_query(
             collection=self.col_songs,
