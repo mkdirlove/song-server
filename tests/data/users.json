@@ -1,0 +1,82 @@
+[
+  {
+    "_id": 1,
+    "user_role": 2,
+    "username": "Barbara Rocha",
+    "password": "pbkdf2:sha256:150000$CCGeEwk6$0ad1faecb5ca9aab2c46d7621cffcdfc67d9ec4a01db31de9ff0fe0690d0f96c",
+    "dob": 977184000,
+    "creation_date": 1.6219662287104862E+09
+  },
+  {
+    "_id": 2,
+    "user_role": 2,
+    "username": "Donald Lee",
+    "password": "pbkdf2:sha256:150000$CCGeEwk6$0ad1faecb5ca9aab2c46d7621cffcdfc67d9ec4a01db31de9ff0fe0690d0f96c",
+    "dob": 983836800,
+    "creation_date": 1.6219662287106266E+09
+  },
+  {
+    "_id": 3,
+    "user_role": 2,
+    "username": "Patrick Smith",
+    "password": "pbkdf2:sha256:150000$CCGeEwk6$0ad1faecb5ca9aab2c46d7621cffcdfc67d9ec4a01db31de9ff0fe0690d0f96c",
+    "dob": 1049673600,
+    "creation_date": 1.6219662287107596E+09
+  },
+  {
+    "_id": 4,
+    "user_role": 2,
+    "username": "Charles Guerrero",
+    "password": "pbkdf2:sha256:150000$CCGeEwk6$0ad1faecb5ca9aab2c46d7621cffcdfc67d9ec4a01db31de9ff0fe0690d0f96c",
+    "dob": 950745600,
+    "creation_date": 1.62196622871089E+09
+  },
+  {
+    "_id": 5,
+    "user_role": 2,
+    "username": "Nicholas Gillespie",
+    "password": "pbkdf2:sha256:150000$CCGeEwk6$0ad1faecb5ca9aab2c46d7621cffcdfc67d9ec4a01db31de9ff0fe0690d0f96c",
+    "dob": 237254400,
+    "creation_date": 1.6219662287110193E+09
+  },
+  {
+    "_id": 6,
+    "user_role": 2,
+    "username": "Richard Shelton",
+    "password": "pbkdf2:sha256:150000$CCGeEwk6$0ad1faecb5ca9aab2c46d7621cffcdfc67d9ec4a01db31de9ff0fe0690d0f96c",
+    "dob": 373593600,
+    "creation_date": 1.6219662287111473E+09
+  },
+  {
+    "_id": 7,
+    "user_role": 2,
+    "username": "Teresa Rodriguez",
+    "password": "pbkdf2:sha256:150000$CCGeEwk6$0ad1faecb5ca9aab2c46d7621cffcdfc67d9ec4a01db31de9ff0fe0690d0f96c",
+    "dob": 148003200,
+    "creation_date": 1.6219662287112777E+09
+  },
+  {
+    "_id": 8,
+    "user_role": 2,
+    "username": "Kimberly Pacheco",
+    "password": "pbkdf2:sha256:150000$CCGeEwk6$0ad1faecb5ca9aab2c46d7621cffcdfc67d9ec4a01db31de9ff0fe0690d0f96c",
+    "dob": 280454400,
+    "creation_date": 1.621966228711411E+09
+  },
+  {
+    "_id": 9,
+    "user_role": 2,
+    "username": "Barry Barrett",
+    "password": "pbkdf2:sha256:150000$CCGeEwk6$0ad1faecb5ca9aab2c46d7621cffcdfc67d9ec4a01db31de9ff0fe0690d0f96c",
+    "dob": 184809600,
+    "creation_date": 1.6219662287115324E+09
+  },
+  {
+    "_id": 10,
+    "user_role": 2,
+    "username": "James Peters",
+    "password": "pbkdf2:sha256:150000$CCGeEwk6$0ad1faecb5ca9aab2c46d7621cffcdfc67d9ec4a01db31de9ff0fe0690d0f96c",
+    "dob": 1052524800,
+    "creation_date": 1.6219662287116518E+09
+  }
+]
