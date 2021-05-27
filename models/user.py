@@ -60,13 +60,6 @@ class User:
 
     @staticmethod
     def from_json(data):
-        """
-        Given a `data` dict, return a user object
-
-        :param data:    data, dict representing user data
-        :return:        User object with data from `data`,
-                        None if parsing fails
-        """
 
         if not isinstance(data, dict):
             return None
@@ -84,13 +77,6 @@ class User:
         return None
 
     def to_json(self):
-        """
-        Json representation of user,
-        Used when inserting the user into the db
-
-        :return: dict representing the user
-        """
-
         cls_vars = vars(self)
         data = {k: v for k, v in cls_vars.items() if k not in ['user_role', 'user_id']}
         _id = {'_id': self.user_id} if self.user_id else {}
