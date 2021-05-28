@@ -1,5 +1,11 @@
 [
   {
+    "_id": 0,
+    "user_role": 1,
+    "username": "admin",
+    "password": "pbkdf2:sha256:150000$MWq1JKzC$bd3a6a3c3c57aeef9ef833e1bcf7c20481a0798734ecb52938a9c7e4489cd8b0"
+  },
+  {
     "_id": 1,
     "user_role": 2,
     "username": "Barbara Rocha",

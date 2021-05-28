@@ -15,9 +15,9 @@ bp_user = Blueprint('user', __name__)
 
 
 @bp_user.route('/login', methods=['POST'])
-def login_user():
+def user_login():
 
-    headers = request.headers
+    headers = request.headers or {}
     username = headers.get('username')
     password = headers.get('password')
     if username is None or password is None:

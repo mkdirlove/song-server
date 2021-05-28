@@ -25,10 +25,6 @@ def app():
     # Return the flask test client
     yield flask_app.test_client()
 
-    # When the test is done, Clean db
-    # from extensions.dbhelper import db_helper
-    # db_helper.drop_all_collections()
-
 
 @pytest.fixture
 def songs_data():
