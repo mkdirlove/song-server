@@ -98,6 +98,9 @@ class DbHelper:
 
         return user
 
+    def remove_user(self, username):
+        self.col_users.delete_one({'username':username})
+
     """
     Utils
     """
