@@ -5,6 +5,7 @@ from flask import Blueprint
 from flask_jwt_extended import create_access_token
 
 from shared.errorcodes import *
+from shared.configs import *
 from shared.decorators import body_sanity_check
 from shared.decorators import parse_user
 from extensions.dbhelper import db_helper
@@ -47,6 +48,12 @@ def add_new_user():
     username = body['username']
     password = body['password']
     dob = body['dob']
+
+    # New user data check
+    if len(username) < MIN_USERNAME_LEN:
+        abort(400, INVALID_USER_DETAILS)
+    if len(password) < MIN_USER_PASSWORD_LEN:
+        abort(400, INVALID_USER_DETAILS)
 
     # Create a new user
     new_user = User(username, password, dob, is_text_password=True)

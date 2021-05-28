@@ -1,7 +1,9 @@
 import pytest
 from werkzeug.security import check_password_hash
 
+from shared.configs import *
 from shared.utils import remove_none_keys
+from shared.utils import search_users_list
 
 
 @pytest.mark.parametrize(
@@ -35,8 +37,7 @@ def test_user_login(app, users_data, username, password):
     # Expected response
     expected_code = 200
     # Search if user exists
-    user = next((item for item in users_data
-                 if item.username == username), None)
+    user = search_users_list(username, users_data)
     if user is None or \
             not check_password_hash(user.password, password):
         expected_code = 401
@@ -59,11 +60,31 @@ def test_user_login(app, users_data, username, password):
     "request_username, request_password, username, password, dob",
     [
         # Invalid login
+        # Leads to failure in generation of access_key
+        # then leads to jwt failure when adding new user
         (None, None, None, None, None),
+        ('admin', 'wrong_password', None, None, None),
+        ('wrong_username', 'wrong_password', None, None, None),
         ('admin', 'wrong_password', 'new_user', 'password', 12345),
-        ('wrong_username', 'wrong_password', 'new_user', 'password', 12345),
 
-        ('admin', 'admin', 'new_user', 'password', 12345),
+        # Valid admin login and access key generation
+        # Invalid body request
+        ('admin', 'admin', None, None, None),               # No body
+        ('admin', 'admin', None, 'password', 12345),        # No username key
+        ('admin', 'admin', 'new_user', None, 12345),        # No password key
+        ('admin', 'admin', 'new_user', 'password', None),   # No dob key
+
+        # Valid admin login and access key generation
+        # Invalid user details
+        ('admin', 'admin', '', '', ''),
+        ('admin', 'admin', '', 'password', 12345),
+        ('admin', 'admin', 'a', 'b', 12345),
+        ('admin', 'admin', 'abc', 'abc', 12345),
+
+        # Duplicate user
+        ('admin', 'admin', 'Donald Lee', 'password', 12345),
+
+        # Valid request
         ('admin', 'admin', 'new_user', 'password', 12345),
     ]
 )
@@ -85,16 +106,23 @@ def test_add_new_user(app, users_data,
 
     # Expected response
     expected_code = 200
+
+    if username is None or \
+            password is None or dob is None:
+        expected_code = 400
+    if len(username or '') < MIN_USERNAME_LEN:
+        expected_code = 400
+    if len(password or '') < MIN_USER_PASSWORD_LEN:
+        expected_code = 400
+
     if headers is None:
         expected_code = 401
 
-    user = next((item for item in users_data
-                 if item.username == request_username), None)
-    new_user = next((item for item in users_data
-                 if item.username == username), None)
+    user = search_users_list(request_username, users_data)
+    new_user = search_users_list(username, users_data)
     if user is None:
         expected_code = 401
-    elif user.can_add_users():
+    elif not user.can_add_users():
         expected_code = 400
 
     if new_user is not None:

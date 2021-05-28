@@ -54,3 +54,8 @@ def remove_none_keys(d):
 
     cleaned = {key: value for key, value in d.items() if value is not None}
     return None if cleaned is {} else cleaned
+
+
+def search_users_list(username, users_list):
+    return next((item for item in users_list
+          if item.username == username), None)
