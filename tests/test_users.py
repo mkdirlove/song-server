@@ -1,26 +1,34 @@
 import pytest
-from werkzeug.security import check_password_hash
 
-from shared.configs import *
+from shared.errorcodes import *
 from shared.utils import remove_none_keys
-from shared.utils import search_users_list
 
 
 @pytest.mark.parametrize(
-    "username, password, expected_code",
+    "username, password, expected_code, return_code",
     [
-        ('username', None, 400),             # Password none
-        (None, 'password', 400),             # Username none
-        (None, None, 400),                   # Data none, leads to empty headers
-        ('', '', 401),                       # Empty headers
+        # Data none, leads to empty headers
+        (None, None, 400, INVALID_DATA_FORMAT),
+        # Username none
+        (None, 'password', 400, INVALID_DATA_FORMAT),
+        # Password none
+        ('username', None, 400, INVALID_DATA_FORMAT),
+        # Null string headers
+        ('', '', 401, SIGN_IN_FAILURE),
 
-        ('admin', 'admin', 200),             # Valid admin login
-        ('admin1', 'admin', 401),            # Invalid admin login
-        ('admin', '12345', 401),             # Invalid password
+        # Valid admin login
+        ('admin', 'admin', 200, SUCCESS),
+        # Invalid admin login
+        ('admin1', 'admin', 401, SIGN_IN_FAILURE),
+        # Invalid password
+        ('admin', '12345', 401, SIGN_IN_FAILURE),
 
-        ('random_user', '12345', 401),       # User doesn't exist
-        ('Barbara Rocha', 'password', 200),  # Valid user login
-        ('Barbara Rocha', '12345678', 401),  # Invalid user login
+        # User doesn't exist
+        ('random_user', '12345', 401, SIGN_IN_FAILURE),
+        # Valid user login
+        ('Barbara Rocha', 'password', 200, SUCCESS),
+        # Invalid user login
+        ('Barbara Rocha', '12345678', 401, SIGN_IN_FAILURE),
 
         # TODO, add different data types data, and different length of data
         # ('abc'*1000, 'password'*1000)
@@ -28,7 +36,7 @@ from shared.utils import search_users_list
     ]
 )
 def test_user_login(app, username, password,
-                    expected_code, is_ignore_assertion=False):
+                    expected_code, return_code, is_ignore_assertion=False):
 
     # Make the login request
     headers = {'username': username, 'password': password}
@@ -37,6 +45,12 @@ def test_user_login(app, username, password,
 
     if not is_ignore_assertion:
         assert request.status_code == expected_code
+
+        # Process request return code
+        # 0 => SUCCESS
+        request_code = request.get_json().get('code') or 0
+        assert request_code == return_code
+
     if request.status_code == 200:
         # Valid request,
         # Ensure that the response has a access key
@@ -49,50 +63,55 @@ def test_user_login(app, username, password,
 
 
 @pytest.mark.parametrize(
-    "request_username, request_password, username, password, dob, expected_code",
+    "request_username, request_password, "
+    "username, password, dob, expected_code, return_code",
     [
         # Invalid login
         # Leads to failure in generation of access_key
         # then leads to jwt failure when adding new user
-        (None, None, None, None, None, 401),
-        ('admin', 'wrong_password', None, None, None, 401),
-        ('wrong_username', 'wrong_password', None, None, None, 401),
-        ('admin', 'wrong_password', 'new_user', 'password', 12345, 401),
+        (None, None, None, None, None, 401, SUCCESS),
+        ('admin', 'wrong_password', None, None, None, 401, SUCCESS),
+        ('wrong_username', 'wrong_password', None, None, None, 401, SUCCESS),
+        ('admin', 'wrong_password', 'new_user', 'password', 12345, 401, SUCCESS),
 
         # Valid admin login and access key generation
         # Invalid body request
-        ('admin', 'admin', None, None, None, 400),               # No body
-        ('admin', 'admin', None, 'password', 12345, 400),        # No username key
-        ('admin', 'admin', 'new_user', None, 12345, 400),        # No password key
-        ('admin', 'admin', 'new_user', 'password', None, 400),   # No dob key
+        # 1. No body
+        ('admin', 'admin', None, None, None, 400, INVALID_DATA_FORMAT),
+        # 2. No username key
+        ('admin', 'admin', None, 'password', 12345, 400, INVALID_DATA_FORMAT),
+        # 3. No password key
+        ('admin', 'admin', 'new_user', None, 12345, 400, INVALID_DATA_FORMAT),
+        # 4. No dob key
+        ('admin', 'admin', 'new_user', 'password', None, 400, INVALID_DATA_FORMAT),
 
         # Valid admin login and access key generation
         # Invalid user details
-        ('admin', 'admin', '', '', '', 400),
-        ('admin', 'admin', '', 'password', 12345, 400),
-        ('admin', 'admin', 'a', 'b', 12345, 400),
-        ('admin', 'admin', 'abc', 'abc', 12345, 400),
+        ('admin', 'admin', '', '', '', 400, INVALID_USER_DETAILS),
+        ('admin', 'admin', '', 'password', 12345, 400, INVALID_USER_DETAILS),
+        ('admin', 'admin', 'a', 'b', 12345, 400, INVALID_USER_DETAILS),
+        ('admin', 'admin', 'abc', 'abc', 12345, 400, INVALID_USER_DETAILS),
 
         # Duplicate user
-        ('admin', 'admin', 'Donald Lee', 'password', 12345, 400),
+        ('admin', 'admin', 'Donald Lee', 'password', 12345, 400, USERNAME_EXISTS),
 
         # Valid request, admin adding a new user
-        ('admin', 'admin', 'new_user', 'password', 12345, 200),
+        ('admin', 'admin', 'new_user', 'password', 12345, 200, SUCCESS),
 
         # Invalid request, non admin trying to add a new user
-        ('Barbara Rocha', 'password', 'new_user', 'password', 12345, 400),
-        ('Barbara Rocha', 'wrong_password', 'new_user', 'password', 12345, 401),
+        ('Barbara Rocha', 'password', 'new_user', 'password', 12345, 400, PRIVILEGE_ERROR),
+        ('Barbara Rocha', 'wrong_password', 'new_user', 'password', 12345, 401, SUCCESS),
 
         # TODO, add different data types data, and different length of data
     ]
 )
 def test_add_new_user(app, request_username, request_password,
-                      username, password, dob, expected_code):
+                      username, password, dob, expected_code, return_code):
 
-    # Make the login request
+    # Make the login request with assertion disabled
     access_key = test_user_login(
         app, request_username, request_password,
-        expected_code, is_ignore_assertion=True)
+        SUCCESS, SUCCESS, is_ignore_assertion=True)
 
     # Make request to add new user
     headers = None
@@ -101,8 +120,11 @@ def test_add_new_user(app, request_username, request_password,
     body = {'username': username, 'password': password, 'dob': dob}
     body = remove_none_keys(body)
     request = app.post('/add_user', json=body, headers=headers)
-
     assert request.status_code == expected_code
+
+    # Process request return code
+    request_code = request.get_json().get('code') or 0
+    assert request_code == return_code
     if request.status_code != 200:
         return
 

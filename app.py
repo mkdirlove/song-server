@@ -27,7 +27,7 @@ def create_app(is_testing=False):
     @flask_app.errorhandler(405)  # method not allowed
     @flask_app.errorhandler(500)  # Internal server error
     def error_handler(e):
-        return jsonify({'code': e.code, 'message': str(e)}), e.code
+        return jsonify({'code': e.description, 'message': str(e)}), e.code
 
     return flask_app
 
