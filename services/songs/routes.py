@@ -31,7 +31,7 @@ def get_all_songs():
 
 @bp_songs.route('/add_song', methods=['POST'])
 @parse_user
-@body_sanity_check(['name', 'cover_url', 'artists', 'source_url', 'release_date'])
+@body_sanity_check(['name', 'cover_url', 'source_url', 'release_date'])
 def add_new_song():
 
     # Confirm if the user can add songs

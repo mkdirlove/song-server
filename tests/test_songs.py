@@ -57,3 +57,56 @@ def test_get_all_songs(app, songs_data, is_filter_explicit, page_number,
         assert request.get_json() is not None
         assert 'data' in request.get_json()
         assert request.get_json() == dict(data=expected_data)
+
+
+@pytest.mark.parametrize(
+    "username, password, song_name, cover_url, source_url, "
+    "release_date, is_explicit, expected_code, return_code",
+    [
+        ('admin', 'admin', 'new-song',
+         'cover-url', 'source-url', 12345, True, 200, SUCCESS),
+    ]
+)
+def test_add_new_song(app, username, password,
+                      song_name, cover_url, source_url, release_date,
+                      is_explicit, expected_code, return_code):
+
+    # Login the user to obtain an access token
+    headers = {'username': username, 'password': password}
+    headers = remove_none_keys(headers)
+    request = app.post('/login', headers=headers)
+
+    assert request is not None
+    assert request.get_json() is not None
+
+    body = request.get_json()
+    assert 'access_key' in body
+    access_token = body.get('access_key')
+    assert len(access_token) > 0
+
+    # Request to add a new song
+    headers = None
+    if access_token is not None:
+        headers = {'Authorization': f'Bearer {access_token}'}
+    body = {
+        'name': song_name,
+        'cover_url': cover_url,
+        'source_url': source_url,
+        'release_date': release_date
+    }
+    body = remove_none_keys(body)
+    request = app.post('/add_song', json=body, headers=headers)
+
+    # Validate response
+    assert request is not None
+    assert request.get_json() is not None
+    assert request.status_code == expected_code
+
+    request_code = request.get_json().get('code') or 0
+    assert request_code == return_code
+    if request.status_code != 200:
+        return
+
+    # If a new song was added remove it
+    from extensions.dbhelper import db_helper
+    db_helper.remove_song(song_name)

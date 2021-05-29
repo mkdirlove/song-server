@@ -69,6 +69,9 @@ class DbHelper:
             page_number=page_number
         )
 
+    def remove_song(self, song_name):
+        self.col_songs.delete_one({'name': song_name})
+
     """
     Users Db
     """

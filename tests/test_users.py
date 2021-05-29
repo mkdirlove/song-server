@@ -112,14 +112,14 @@ def test_add_new_user(app, request_username, request_password,
                       username, password, dob, expected_code, return_code):
 
     # Make the login request with assertion disabled
-    access_key = test_user_login(
+    access_token = test_user_login(
         app, request_username, request_password,
         SUCCESS, SUCCESS, is_ignore_assertion=True)
 
     # Make request to add new user
     headers = None
-    if access_key is not None:
-        headers = {'Authorization': f'Bearer {access_key}'}
+    if access_token is not None:
+        headers = {'Authorization': f'Bearer {access_token}'}
     body = {'username': username, 'password': password, 'dob': dob}
     body = remove_none_keys(body)
     request = app.post('/add_user', json=body, headers=headers)
