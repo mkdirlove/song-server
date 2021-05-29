@@ -18,7 +18,7 @@ def get_all_songs():
 
     # Process query filters if any
     body = request.get_json() or {}
-    is_filter_explicit = body.get('is_explicit') or False
+    is_filter_explicit = body.get('is_filter_explicit') or False
     page_number = body.get('page_number') or 1
 
     if page_number <= 0:
