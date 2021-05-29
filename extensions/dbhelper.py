@@ -66,7 +66,8 @@ class DbHelper:
 
     def get_songs(self, page_number=1, explicit_query=False):
 
-        explicit_query = {'is_explicit': {'$ne': True}} if explicit_query else {}
+        explicit_query = {'is_explicit': {'$ne': True}} \
+            if explicit_query else {}
         find_query = {**explicit_query}
 
         return self._execute_query(
