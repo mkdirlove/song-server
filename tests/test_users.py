@@ -43,13 +43,16 @@ def test_user_login(app, username, password,
     headers = remove_none_keys(headers)
     request = app.post('/login', headers=headers)
 
+    assert request is not None
+    assert request.get_json() is not None
+
     if not is_ignore_assertion:
         assert request.status_code == expected_code
 
         # Process request return code
         # 0 => SUCCESS
-        request_code = request.get_json().get('code') or 0
-        assert request_code == return_code
+        request_return_code = request.get_json().get('code') or 0
+        assert request_return_code == return_code
 
     if request.status_code == 200:
         # Valid request,
@@ -120,6 +123,9 @@ def test_add_new_user(app, request_username, request_password,
     body = {'username': username, 'password': password, 'dob': dob}
     body = remove_none_keys(body)
     request = app.post('/add_user', json=body, headers=headers)
+
+    assert request is not None
+    assert request.get_json() is not None
     assert request.status_code == expected_code
 
     # Process request return code
