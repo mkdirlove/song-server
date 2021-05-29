@@ -60,11 +60,50 @@ def test_get_all_songs(app, songs_data, is_filter_explicit, page_number,
 
 
 @pytest.mark.parametrize(
-    "username, password, song_name, cover_url, source_url, "
-    "release_date, is_explicit, expected_code, return_code",
+    "username, password, song_name, cover_url, "
+    "source_url, release_date, is_explicit, expected_code, return_code",
     [
-        ('admin', 'admin', 'new-song',
-         'cover-url', 'source-url', 12345, True, 200, SUCCESS),
+        # Invalid login
+        # Jwt failure when adding new user
+        (None, None, None, None, None, None, None, 401, SUCCESS),
+        ('admin', 'wrong_password', None, None, None, None, None, 401, SUCCESS),
+        ('wrong_username', 'wrong_password', None, None, None, None, None, 401, SUCCESS),
+        ('admin', 'wrong_password', None, None, None, None, None, 401, SUCCESS),
+
+        # Valid admin login, Invalid body
+        # 1. No song-name
+        ('admin', 'admin', None, 'url', 'url', 12345, True, 400, INVALID_DATA_FORMAT),
+        # 2. No cover-url
+        ('admin', 'admin', 'song-name', None, 'url', 12345, True, 400, INVALID_DATA_FORMAT),
+        # 3. No source-url
+        ('admin', 'admin', 'song-name', 'url', None, 12345, True, 400, INVALID_DATA_FORMAT),
+        # 4. No release-date
+        ('admin', 'admin', 'song-name', 'url', 'url', None, True, 400, INVALID_DATA_FORMAT),
+        # 4. No explicit tag, defaults to False
+        ('admin', 'admin', 'song-name', 'url', 'url', 12345, None, 200, SUCCESS),
+
+        # Duplicate songs
+        # 1. Same song-name and different source-url allowed
+        ('admin', 'admin', 'Whatever put local society same.', 'url',
+         'url', 12345, None, 200, SUCCESS),
+        # 2. Same song-name and same source-url not allowed
+        ('admin', 'admin', 'Whatever put local society same.', 'url',
+         'www.song_server.com/2192', 12345, None, 400, SONG_EXISTS),
+        # 3. cover-url immaterial
+        ('admin', 'admin', 'Whatever put local society same.',
+         'www.song_server.com/2192', 'url', 12345, None, 200, SUCCESS),
+
+        # Invalid request, non-admin trying to add a new song
+        ('Barbara Rocha', 'password', 'new-song', 'url', 'url',
+         12345, None, 400, PRIVILEGE_ERROR),
+        ('Barbara Rocha', 'bad-password', 'new-song', 'url', 'url',
+         12345, None, 401, SUCCESS),
+
+        # Valid request, admin adding a new song
+        ('admin', 'admin', 'new-song', 'url', 'url', 12345, True, 200, SUCCESS),
+        ('admin', 'admin', 'new-song', 'url', 'url', 12345, False, 200, SUCCESS),
+        # ('admin', 'admin', 'new-song', 'url', 'url', 0, False, 200, SUCCESS),
+        # ('admin', 'admin', 'new-song', 'url', 'url', -9999, False, 200, SUCCESS),
     ]
 )
 def test_add_new_song(app, username, password,
@@ -79,10 +118,8 @@ def test_add_new_song(app, username, password,
     assert request is not None
     assert request.get_json() is not None
 
-    body = request.get_json()
-    assert 'access_key' in body
+    body = request.get_json() or {}
     access_token = body.get('access_key')
-    assert len(access_token) > 0
 
     # Request to add a new song
     headers = None

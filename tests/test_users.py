@@ -101,7 +101,7 @@ def test_user_login(app, username, password,
         # Valid request, admin adding a new user
         ('admin', 'admin', 'new_user', 'password', 12345, 200, SUCCESS),
 
-        # Invalid request, non admin trying to add a new user
+        # Invalid request, non-admin trying to add a new user
         ('Barbara Rocha', 'password', 'new_user', 'password', 12345, 400, PRIVILEGE_ERROR),
         ('Barbara Rocha', 'wrong_password', 'new_user', 'password', 12345, 401, SUCCESS),
 

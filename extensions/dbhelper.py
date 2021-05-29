@@ -24,6 +24,9 @@ class DbHelper:
         # Set unique keys
         self.col_users.create_index(
             [("username", pymongo.ASCENDING)], unique=True)
+        self.col_songs.create_index(
+            [("name", pymongo.ASCENDING),
+             ("source_url", pymongo.ASCENDING)], unique=True)
 
     @staticmethod
     def _execute_query(collection, find_query, sort_by, page_number=1):
@@ -46,8 +49,12 @@ class DbHelper:
                 self.col_users.insert_one(item.to_json())
                 return SUCCESS
         except DuplicateKeyError:
-            return USERNAME_EXISTS \
-                if is_user else DB_OPERATION_FAILURE
+            if is_user:
+                return USERNAME_EXISTS
+            if is_song:
+                return SONG_EXISTS
+
+            return DB_OPERATION_FAILURE
         except:
             return DB_OPERATION_FAILURE
 

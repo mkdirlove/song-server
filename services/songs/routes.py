@@ -4,6 +4,7 @@ from flask import jsonify
 from flask import Blueprint
 
 from shared.errorcodes import *
+from shared.configs import *
 from shared.utils import parse_json
 from shared.decorators import body_sanity_check
 from shared.decorators import parse_user
@@ -44,6 +45,9 @@ def add_new_song():
     source_url = body['source_url']
     release_date = body['release_date']
     is_explicit = body.get('is_explicit') or False
+
+    if len(name) < MIN_SONG_NAME_LEN:
+        abort(400, INVALID_SONG_DETAILS)
 
     # Create a new song
     new_song = Song(name, cover_url, source_url,
