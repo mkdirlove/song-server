@@ -20,7 +20,7 @@ class UserRoles(Enum):
 class User:
 
     """
-    User data container,
+    User data container
     """
 
     def __init__(self, username, password,

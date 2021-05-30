@@ -1,6 +1,10 @@
 
 class Song:
 
+    """
+    Song data container
+    """
+
     def __init__(self, name, cover_url, source_url, release_date,
                  is_explicit=False, times_played=0, num_likes=0, song_id=None):
 
@@ -37,5 +41,5 @@ class Song:
 
         return {**_id, **data}
 
-    def __str__(self):
+    def __repr__(self):
         return f"name: {self.name}, likes: {self.num_likes}, played: {self.times_played}"
