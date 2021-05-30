@@ -49,12 +49,6 @@ def add_new_user():
     password = body['password']
     dob = body['dob']
 
-    # New user data check
-    if len(username) < MIN_USERNAME_LEN:
-        abort(400, INVALID_USER_DETAILS)
-    if len(password) < MIN_USER_PASSWORD_LEN:
-        abort(400, INVALID_USER_DETAILS)
-
     # Create a new user
     new_user = User(username, password, dob, is_text_password=True)
     ret = db_helper.add_item(new_user)

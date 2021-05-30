@@ -9,19 +9,19 @@ from shared.utils import remove_none_keys
     "is_filter_explicit, page_number, expected_code, return_code",
     [
         # None data
-        (None, None, 200, SUCCESS),
-        (True, None, 200, SUCCESS),
-        (None, 0, 200, SUCCESS),
+        (None, None, 201, SUCCESS),
+        (True, None, 201, SUCCESS),
+        (None, 0, 400, INVALID_DATA_FORMAT),
 
         # page-number
         (None, -1, 400, INVALID_DATA_FORMAT),
         (None, -999, 400, INVALID_DATA_FORMAT),
-        (None, 1, 200, SUCCESS),
-        (None, 99999, 200, SUCCESS),
+        (None, 1, 201, SUCCESS),
+        (None, 99999, 201, SUCCESS),
 
         # is-filter-explicit
-        (True, 1, 200, SUCCESS),
-        (False, 1, 200, SUCCESS),
+        (True, 1, 201, SUCCESS),
+        (False, 1, 201, SUCCESS),
     ]
 )
 def test_get_all_songs(app, songs_data, is_filter_explicit, page_number,
@@ -41,7 +41,7 @@ def test_get_all_songs(app, songs_data, is_filter_explicit, page_number,
     assert request_return_code == return_code
     assert request.status_code == expected_code
 
-    if request.status_code == 200:
+    if request.status_code == 201:
 
         # default transformations within request
         is_filter_explicit = is_filter_explicit or False
@@ -80,18 +80,18 @@ def test_get_all_songs(app, songs_data, is_filter_explicit, page_number,
         # 4. No release-date
         ('admin', 'admin', 'song-name', 'url', 'url', None, True, 400, INVALID_DATA_FORMAT),
         # 4. No explicit tag, defaults to False
-        ('admin', 'admin', 'song-name', 'url', 'url', 12345, None, 200, SUCCESS),
+        ('admin', 'admin', 'song-name', 'url', 'url', 12345, None, 201, SUCCESS),
 
         # Duplicate songs
         # 1. Same song-name and different source-url allowed
         ('admin', 'admin', 'Whatever put local society same.', 'url',
-         'url', 12345, None, 200, SUCCESS),
+         'url', 12345, None, 201, SUCCESS),
         # 2. Same song-name and same source-url not allowed
         ('admin', 'admin', 'Whatever put local society same.', 'url',
          'www.song_server.com/2192', 12345, None, 400, SONG_EXISTS),
         # 3. cover-url immaterial
         ('admin', 'admin', 'Whatever put local society same.',
-         'www.song_server.com/2192', 'url', 12345, None, 200, SUCCESS),
+         'www.song_server.com/2192', 'url', 12345, None, 201, SUCCESS),
 
         # Invalid request, non-admin trying to add a new song
         ('Barbara Rocha', 'password', 'new-song', 'url', 'url',
@@ -100,10 +100,10 @@ def test_get_all_songs(app, songs_data, is_filter_explicit, page_number,
          12345, None, 401, SUCCESS),
 
         # Valid request, admin adding a new song
-        ('admin', 'admin', 'new-song', 'url', 'url', 12345, True, 200, SUCCESS),
-        ('admin', 'admin', 'new-song', 'url', 'url', 12345, False, 200, SUCCESS),
-        # ('admin', 'admin', 'new-song', 'url', 'url', 0, False, 200, SUCCESS),
-        # ('admin', 'admin', 'new-song', 'url', 'url', -9999, False, 200, SUCCESS),
+        ('admin', 'admin', 'new-song', 'url', 'url', 12345, True, 201, SUCCESS),
+        ('admin', 'admin', 'new-song', 'url', 'url', 12345, False, 201, SUCCESS),
+        # ('admin', 'admin', 'new-song', 'url', 'url', 0, False, 201, SUCCESS),
+        # ('admin', 'admin', 'new-song', 'url', 'url', -9999, False, 201, SUCCESS),
     ]
 )
 def test_add_new_song(app, username, password,
@@ -129,7 +129,8 @@ def test_add_new_song(app, username, password,
         'name': song_name,
         'cover_url': cover_url,
         'source_url': source_url,
-        'release_date': release_date
+        'release_date': release_date,
+        'is_explicit': is_explicit
     }
     body = remove_none_keys(body)
     request = app.post('/add_song', json=body, headers=headers)
@@ -141,9 +142,9 @@ def test_add_new_song(app, username, password,
 
     request_code = request.get_json().get('code') or 0
     assert request_code == return_code
-    if request.status_code != 200:
+    if request.status_code != 201:
         return
 
     # If a new song was added remove it
     from extensions.dbhelper import db_helper
-    db_helper.remove_song(song_name)
+    db_helper.remove_song(song_name, source_url)

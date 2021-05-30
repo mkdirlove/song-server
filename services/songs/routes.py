@@ -4,7 +4,6 @@ from flask import jsonify
 from flask import Blueprint
 
 from shared.errorcodes import *
-from shared.configs import *
 from shared.utils import parse_json
 from shared.decorators import body_sanity_check
 from shared.decorators import parse_user
@@ -15,6 +14,10 @@ bp_songs = Blueprint('songs', __name__)
 
 
 @bp_songs.route('/get_songs')
+@body_sanity_check({
+    'page_number': {'type': 'integer', 'min': 1, 'required': False},
+    'is_filter_explicit': {'type': 'boolean', 'required': False},
+})
 def get_all_songs():
 
     # Process query filters if any
@@ -27,12 +30,18 @@ def get_all_songs():
 
     data = db_helper.get_songs(
         page_number, is_filter_explicit)
-    return jsonify({'data': parse_json(data)}), 200
+    return jsonify({'data': parse_json(data)}), 201
 
 
 @bp_songs.route('/add_song', methods=['POST'])
 @parse_user
-@body_sanity_check(['name', 'cover_url', 'source_url', 'release_date'])
+@body_sanity_check({
+    'name': {'type': 'string', 'maxlength': 100, 'minlength': 3, 'required': True},
+    'cover_url': {'type': 'string', 'maxlength': 100, 'minlength': 3, 'required': True},
+    'source_url': {'type': 'string', 'maxlength': 100, 'minlength': 3, 'required': True},
+    'release_date': {'type': 'integer', 'min': 0, 'required': True},
+    'is_explicit': {'type': 'boolean', 'required': False}
+})
 def add_new_song():
 
     # Confirm if the user can add songs
@@ -46,9 +55,6 @@ def add_new_song():
     release_date = body['release_date']
     is_explicit = body.get('is_explicit') or False
 
-    if len(name) < MIN_SONG_NAME_LEN:
-        abort(400, INVALID_SONG_DETAILS)
-
     # Create a new song
     new_song = Song(name, cover_url, source_url,
                     release_date, is_explicit=is_explicit)
@@ -56,4 +62,4 @@ def add_new_song():
     if ret != SUCCESS:
         abort(400, ret)
 
-    return jsonify({"message": "New song added"}), 200
+    return jsonify({"message": "New song added"}), 201
