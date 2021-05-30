@@ -102,11 +102,19 @@ def test_get_all_songs(app, songs_data, is_filter_explicit, page_number,
         ('admin', 'admin', 'new-song', 'url', 'url', False, 201, SUCCESS),
 
         # Invalid data, either type or value
-        ('admin', 'admin', 'new-song', 'url', 'url', False, 201, SUCCESS),
+        ('admin', 'admin', 'new-song', 'url', 'url', -1, 400, INVALID_DATA_FORMAT),
         ('admin', 'admin', 9921, 'url', 'url', False, 400, INVALID_DATA_FORMAT),
         ('admin', 'admin', 'new-song', {'a': 1}, 'url', False, 400, INVALID_DATA_FORMAT),
         ('admin', 'admin', 'new-song', {'a': 1}, ['item'], 100, 400, INVALID_DATA_FORMAT),
         ('admin', 'admin', 'new-song', {'a': 1}, ['item'], False, 400, INVALID_DATA_FORMAT),
+
+        # Invalid data length
+        ('admin', 'admin', '', 'url', 'url', True, 400, INVALID_DATA_FORMAT),
+        ('admin', 'admin', 'new-song', '', 'url', True, 400, INVALID_DATA_FORMAT),
+        ('admin', 'admin', 'new-song', 'url', '', True, 400, INVALID_DATA_FORMAT),
+        ('admin', 'admin', 'song-name'*1000, 'url', 'url', True, 400, INVALID_DATA_FORMAT),
+        ('admin', 'admin', 'new-song', 'url'*1000, 'url', True, 400, INVALID_DATA_FORMAT),
+        ('admin', 'admin', 'new-song', 'url', 'url'*1000, True, 400, INVALID_DATA_FORMAT),
     ]
 )
 def test_add_new_song(app, username, password,
