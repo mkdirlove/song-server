@@ -61,53 +61,56 @@ def test_get_all_songs(app, songs_data, is_filter_explicit, page_number,
 
 @pytest.mark.parametrize(
     "username, password, song_name, cover_url, "
-    "source_url, release_date, is_explicit, expected_code, return_code",
+    "source_url, is_explicit, expected_code, return_code",
     [
         # Invalid login
         # Jwt failure when adding new user
-        (None, None, None, None, None, None, None, 401, SUCCESS),
-        ('admin', 'wrong_password', None, None, None, None, None, 401, SUCCESS),
-        ('wrong_username', 'wrong_password', None, None, None, None, None, 401, SUCCESS),
-        ('admin', 'wrong_password', None, None, None, None, None, 401, SUCCESS),
+        (None, None, None, None, None, None, 401, SUCCESS),
+        ('admin', 'wrong_password', None, None, None, None, 401, SUCCESS),
+        ('wrong_username', 'wrong_password', None, None, None, None, 401, SUCCESS),
+        ('admin', 'wrong_password', None, None, None, None, 401, SUCCESS),
 
         # Valid admin login, Invalid body
         # 1. No song-name
-        ('admin', 'admin', None, 'url', 'url', 12345, True, 400, INVALID_DATA_FORMAT),
+        ('admin', 'admin', None, 'url', 'url', True, 400, INVALID_DATA_FORMAT),
         # 2. No cover-url
-        ('admin', 'admin', 'song-name', None, 'url', 12345, True, 400, INVALID_DATA_FORMAT),
+        ('admin', 'admin', 'song-name', None, 'url', True, 400, INVALID_DATA_FORMAT),
         # 3. No source-url
-        ('admin', 'admin', 'song-name', 'url', None, 12345, True, 400, INVALID_DATA_FORMAT),
-        # 4. No release-date
-        ('admin', 'admin', 'song-name', 'url', 'url', None, True, 400, INVALID_DATA_FORMAT),
+        ('admin', 'admin', 'song-name', 'url', None, True, 400, INVALID_DATA_FORMAT),
         # 4. No explicit tag, defaults to False
-        ('admin', 'admin', 'song-name', 'url', 'url', 12345, None, 201, SUCCESS),
+        ('admin', 'admin', 'song-name', 'url', 'url', None, 201, SUCCESS),
 
         # Duplicate songs
         # 1. Same song-name and different source-url allowed
         ('admin', 'admin', 'Whatever put local society same.', 'url',
-         'url', 12345, None, 201, SUCCESS),
+         'url', None, 201, SUCCESS),
         # 2. Same song-name and same source-url not allowed
         ('admin', 'admin', 'Whatever put local society same.', 'url',
-         'www.song_server.com/2192', 12345, None, 400, SONG_EXISTS),
+         'www.song_server.com/2192', None, 400, SONG_EXISTS),
         # 3. cover-url immaterial
         ('admin', 'admin', 'Whatever put local society same.',
-         'www.song_server.com/2192', 'url', 12345, None, 201, SUCCESS),
+         'www.song_server.com/2192', 'url', None, 201, SUCCESS),
 
         # Invalid request, non-admin trying to add a new song
-        ('Barbara Rocha', 'password', 'new-song', 'url', 'url',
-         12345, None, 400, PRIVILEGE_ERROR),
-        ('Barbara Rocha', 'bad-password', 'new-song', 'url', 'url',
-         12345, None, 401, SUCCESS),
+        ('Barbara Rocha', 'password', 'new-song',
+         'url', 'url', None, 400, PRIVILEGE_ERROR),
+        ('Barbara Rocha', 'bad-password', 'new-song',
+         'url', 'url', None, 401, SUCCESS),
 
         # Valid request, admin adding a new song
-        ('admin', 'admin', 'new-song', 'url', 'url', 12345, True, 201, SUCCESS),
-        ('admin', 'admin', 'new-song', 'url', 'url', 12345, False, 201, SUCCESS),
-        # ('admin', 'admin', 'new-song', 'url', 'url', 0, False, 201, SUCCESS),
-        # ('admin', 'admin', 'new-song', 'url', 'url', -9999, False, 201, SUCCESS),
+        ('admin', 'admin', 'new-song', 'url', 'url', True, 201, SUCCESS),
+        ('admin', 'admin', 'new-song', 'url', 'url', False, 201, SUCCESS),
+
+        # Invalid data, either type or value
+        ('admin', 'admin', 'new-song', 'url', 'url', False, 201, SUCCESS),
+        ('admin', 'admin', 9921, 'url', 'url', False, 400, INVALID_DATA_FORMAT),
+        ('admin', 'admin', 'new-song', {'a': 1}, 'url', False, 400, INVALID_DATA_FORMAT),
+        ('admin', 'admin', 'new-song', {'a': 1}, ['item'], 100, 400, INVALID_DATA_FORMAT),
+        ('admin', 'admin', 'new-song', {'a': 1}, ['item'], False, 400, INVALID_DATA_FORMAT),
     ]
 )
 def test_add_new_song(app, username, password,
-                      song_name, cover_url, source_url, release_date,
+                      song_name, cover_url, source_url,
                       is_explicit, expected_code, return_code):
 
     # Login the user to obtain an access token
@@ -129,7 +132,6 @@ def test_add_new_song(app, username, password,
         'name': song_name,
         'cover_url': cover_url,
         'source_url': source_url,
-        'release_date': release_date,
         'is_explicit': is_explicit
     }
     body = remove_none_keys(body)

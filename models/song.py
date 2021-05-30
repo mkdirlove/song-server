@@ -5,14 +5,13 @@ class Song:
     Song data container
     """
 
-    def __init__(self, name, cover_url, source_url, release_date,
+    def __init__(self, name, cover_url, source_url,
                  is_explicit=False, times_played=0, num_likes=0, song_id=None):
 
         self.song_id = song_id
         self.name = name
         self.cover_url = cover_url
         self.source_url = source_url
-        self.release_date = release_date
         self.is_explicit = is_explicit
         self.times_played = times_played
         self.num_likes = num_likes
@@ -25,7 +24,6 @@ class Song:
                 name=data['name'],
                 cover_url=data['cover_url'],
                 source_url=data['source_url'],
-                release_date=data['release_date'],
                 is_explicit=data['is_explicit'],
                 times_played=data['times_played'],
                 num_likes=data['num_likes'])

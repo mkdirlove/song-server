@@ -39,7 +39,6 @@ def get_all_songs():
     'name': {'type': 'string', 'maxlength': 100, 'minlength': 3, 'required': True},
     'cover_url': {'type': 'string', 'maxlength': 100, 'minlength': 3, 'required': True},
     'source_url': {'type': 'string', 'maxlength': 100, 'minlength': 3, 'required': True},
-    'release_date': {'type': 'integer', 'min': 0, 'required': True},
     'is_explicit': {'type': 'boolean', 'required': False}
 })
 def add_new_song():
@@ -52,12 +51,10 @@ def add_new_song():
     name = body['name']
     cover_url = body['cover_url']
     source_url = body['source_url']
-    release_date = body['release_date']
     is_explicit = body.get('is_explicit') or False
 
     # Create a new song
-    new_song = Song(name, cover_url, source_url,
-                    release_date, is_explicit=is_explicit)
+    new_song = Song(name, cover_url, source_url, is_explicit=is_explicit)
     ret = db_helper.add_item(new_song)
     if ret != SUCCESS:
         abort(400, ret)
