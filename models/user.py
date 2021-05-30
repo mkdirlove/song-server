@@ -40,7 +40,7 @@ class User:
         self.user_role = self._get_user_role(user_role)
 
         if is_text_password:
-            self.password = generate_password_hash(self.password)
+            self.password = generate_password_hash(str(self.password))
 
     def can_add_users(self):
         if self.user_role.is_admin():
@@ -76,7 +76,6 @@ class User:
 
     def is_valid(self):
         is_types_valid = all([
-            is_type_valid(self.user_id, str),
             is_type_valid(self.username, str),
             is_type_valid(self.password, str),
             is_type_valid(self.user_role, UserRoles),
@@ -86,7 +85,7 @@ class User:
 
         is_value_valid = all([
             MIN_USERNAME_LEN <= len(self.username) <= MAX_USERNAME_LEN,
-            MIN_USERNAME_LEN <= len(self.password_text) <= MAX_USERNAME_LEN,
+            MIN_USERNAME_LEN <= len(str(self.password_text)) <= MAX_USERNAME_LEN,
         ])
         return is_value_valid
 

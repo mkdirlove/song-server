@@ -17,7 +17,7 @@ from shared.utils import remove_none_keys
         ('', '', 401, SIGN_IN_FAILURE),
 
         # Valid admin login
-        ('admin', 'admin', 200, SUCCESS),
+        ('admin', 'admin', 201, SUCCESS),
         # Invalid admin login
         ('admin1', 'admin', 401, SIGN_IN_FAILURE),
         # Invalid password
@@ -26,13 +26,15 @@ from shared.utils import remove_none_keys
         # User doesn't exist
         ('random_user', '12345', 401, SIGN_IN_FAILURE),
         # Valid user login
-        ('Barbara Rocha', 'password', 200, SUCCESS),
+        ('Barbara Rocha', 'password', 201, SUCCESS),
         # Invalid user login
         ('Barbara Rocha', '12345678', 401, SIGN_IN_FAILURE),
 
-        # TODO, add different data types data, and different length of data
-        # ('abc'*1000, 'password'*1000)
-        # (100, {'one': 1})
+        # Invalid data, either types or len
+        ('abc'*1000, 'password', 401, SIGN_IN_FAILURE),
+        ('abcdef', 'password'*1000, 401, SIGN_IN_FAILURE),
+        # (100, 'password', 400, INVALID_DATA_FORMAT),
+        # ('abcdef', {'one': 1}, 400, INVALID_DATA_FORMAT),
     ]
 )
 def test_user_login(app, username, password,
@@ -54,7 +56,7 @@ def test_user_login(app, username, password,
         request_return_code = request.get_json().get('code') or 0
         assert request_return_code == return_code
 
-    if request.status_code == 200:
+    if request.status_code == 201:
         # Valid request,
         # Ensure that the response has a access key
         body = request.get_json()
@@ -67,49 +69,51 @@ def test_user_login(app, username, password,
 
 @pytest.mark.parametrize(
     "request_username, request_password, "
-    "username, password, dob, expected_code, return_code",
+    "username, password, expected_code, return_code",
     [
         # Invalid login
         # Leads to failure in generation of access_key
         # then leads to jwt failure when adding new user
-        (None, None, None, None, None, 401, SUCCESS),
-        ('admin', 'wrong_password', None, None, None, 401, SUCCESS),
-        ('wrong_username', 'wrong_password', None, None, None, 401, SUCCESS),
-        ('admin', 'wrong_password', 'new_user', 'password', 12345, 401, SUCCESS),
+        (None, None, None, None, 401, SUCCESS),
+        ('admin', 'wrong_password', None, None, 401, SUCCESS),
+        ('wrong_username', 'wrong_password', None, None, 401, SUCCESS),
+        ('admin', 'wrong_password', 'new_user', 'password', 401, SUCCESS),
 
         # Valid admin login and access key generation
         # Invalid body request
         # 1. No body
-        ('admin', 'admin', None, None, None, 400, INVALID_DATA_FORMAT),
+        ('admin', 'admin', None, None, 400, INVALID_DATA_FORMAT),
         # 2. No username key
-        ('admin', 'admin', None, 'password', 12345, 400, INVALID_DATA_FORMAT),
+        ('admin', 'admin', None, 'password', 400, INVALID_DATA_FORMAT),
         # 3. No password key
-        ('admin', 'admin', 'new_user', None, 12345, 400, INVALID_DATA_FORMAT),
-        # 4. No dob key
-        ('admin', 'admin', 'new_user', 'password', None, 400, INVALID_DATA_FORMAT),
+        ('admin', 'admin', 'new_user', None, 400, INVALID_DATA_FORMAT),
 
         # Valid admin login and access key generation
         # Invalid user details
-        ('admin', 'admin', '', '', '', 400, INVALID_USER_DETAILS),
-        ('admin', 'admin', '', 'password', 12345, 400, INVALID_USER_DETAILS),
-        ('admin', 'admin', 'a', 'b', 12345, 400, INVALID_USER_DETAILS),
-        ('admin', 'admin', 'abc', 'abc', 12345, 400, INVALID_USER_DETAILS),
+        ('admin', 'admin', '', '', 400, INVALID_USER_DETAILS),
+        ('admin', 'admin', '', 'password', 400, INVALID_USER_DETAILS),
+        ('admin', 'admin', 'a', 'b', 400, INVALID_USER_DETAILS),
+        ('admin', 'admin', 'abc', 'abc', 400, INVALID_USER_DETAILS),
 
         # Duplicate user
-        ('admin', 'admin', 'Donald Lee', 'password', 12345, 400, USERNAME_EXISTS),
+        ('admin', 'admin', 'Donald Lee', 'password', 400, USERNAME_EXISTS),
 
         # Valid request, admin adding a new user
-        ('admin', 'admin', 'new_user', 'password', 12345, 200, SUCCESS),
+        ('admin', 'admin', 'new_user', 'password', 201, SUCCESS),
 
         # Invalid request, non-admin trying to add a new user
-        ('Barbara Rocha', 'password', 'new_user', 'password', 12345, 400, PRIVILEGE_ERROR),
-        ('Barbara Rocha', 'wrong_password', 'new_user', 'password', 12345, 401, SUCCESS),
+        ('Barbara Rocha', 'password', 'new_user', 'password', 400, PRIVILEGE_ERROR),
+        ('Barbara Rocha', 'wrong_password', 'new_user', 'password', 401, SUCCESS),
 
-        # TODO, add different data types data, and different length of data
+        # Invalid data types or invalid length
+        ('admin', 'admin', ['item'], 'password', 400, INVALID_USER_DETAILS),
+        ('admin', 'admin', 'new-user', 1000, 400, INVALID_USER_DETAILS),
+        ('admin', 'admin', 'new_user'*100, 'password', 400, INVALID_USER_DETAILS),
+        ('admin', 'admin', 'new_user', 'password'*100, 400, INVALID_USER_DETAILS),
     ]
 )
 def test_add_new_user(app, request_username, request_password,
-                      username, password, dob, expected_code, return_code):
+                      username, password, expected_code, return_code):
 
     # Make the login request with assertion disabled
     access_token = test_user_login(
@@ -120,7 +124,7 @@ def test_add_new_user(app, request_username, request_password,
     headers = None
     if access_token is not None:
         headers = {'Authorization': f'Bearer {access_token}'}
-    body = {'username': username, 'password': password, 'dob': dob}
+    body = {'username': username, 'password': password}
     body = remove_none_keys(body)
     request = app.post('/add_user', json=body, headers=headers)
 
@@ -131,7 +135,7 @@ def test_add_new_user(app, request_username, request_password,
     # Process request return code
     request_code = request.get_json().get('code') or 0
     assert request_code == return_code
-    if request.status_code != 200:
+    if request.status_code != 201:
         return
 
     # If a new user was added clean up the user

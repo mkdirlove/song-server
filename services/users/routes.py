@@ -5,6 +5,8 @@ from flask import Blueprint
 from flask_jwt_extended import create_access_token
 
 from shared.errorcodes import *
+from shared.configs import *
+from shared.utils import is_type_valid
 from shared.decorators import body_sanity_check
 from shared.decorators import parse_user
 from extensions.dbhelper import db_helper
@@ -23,6 +25,18 @@ def user_login():
     if username is None or password is None:
         abort(400, INVALID_DATA_FORMAT)
 
+    # Type checks
+    if not is_type_valid(username, str):
+        abort(400, INVALID_DATA_FORMAT)
+    if not is_type_valid(password, str):
+        abort(400, INVALID_DATA_FORMAT)
+
+    # Length checks
+    if 0 >= len(username) >= MAX_USERNAME_LEN:
+        abort(400, SIGN_IN_FAILURE)
+    if 0 >= len(password) >= MAX_PASSWORD_LEN:
+        abort(400, SIGN_IN_FAILURE)
+
     user = db_helper.login_user(username, password)
     if not user:
         abort(401, SIGN_IN_FAILURE)
@@ -32,12 +46,12 @@ def user_login():
         "message": "successful login",
         "access_key": access_key
     }
-    return jsonify(ret), 200
+    return jsonify(ret), 201
 
 
 @bp_user.route('/add_user', methods=['POST'])
 @parse_user
-@body_sanity_check(['username', 'password', 'dob'])
+@body_sanity_check(['username', 'password'])
 def add_new_user():
 
     if not add_new_user.user.can_add_users():
@@ -46,10 +60,9 @@ def add_new_user():
     body = request.get_json()
     username = body['username']
     password = body['password']
-    dob = body['dob']
 
     # Create a new user
-    new_user = User(username, password, dob, is_text_password=True)
+    new_user = User(username, password, is_text_password=True)
     if not new_user.is_valid():
         abort(400, INVALID_USER_DETAILS)
 
@@ -58,4 +71,4 @@ def add_new_user():
         # User addition failed
         abort(400, ret)
 
-    return jsonify({"message": "New user added"}), 200
+    return jsonify({"message": "New user added"}), 201

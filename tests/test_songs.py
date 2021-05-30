@@ -103,10 +103,10 @@ def test_get_all_songs(app, songs_data, is_filter_explicit, page_number,
         ('admin', 'admin', 'new-song', 'url', 'url', False, 201, SUCCESS),
 
         # Invalid data, either type or value
-        ('admin', 'admin', 'new-song', 'url', 'url', -1, 400, INVALID_SONG_DETAILS),
         ('admin', 'admin', 9921, 'url', 'url', False, 400, INVALID_SONG_DETAILS),
         ('admin', 'admin', 'new-song', {'a': 1}, 'url', False, 400, INVALID_SONG_DETAILS),
-        ('admin', 'admin', 'new-song', {'a': 1}, ['item'], 100, 400, INVALID_SONG_DETAILS),
+        ('admin', 'admin', 'new-song', 'url', ['item'], True, 400, INVALID_SONG_DETAILS),
+        ('admin', 'admin', 'new-song', 'url', 'url', 100, 400, INVALID_SONG_DETAILS),
         ('admin', 'admin', 'new-song', {'a': 1}, ['item'], False, 400, INVALID_SONG_DETAILS),
 
         # Invalid data length
