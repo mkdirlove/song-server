@@ -4,9 +4,6 @@ import os
 import json
 from bson import json_util
 
-from models.user import User
-from models.user import UserRoles
-
 
 def parse_json(data):
     return json.loads(json_util.dumps(data))
@@ -33,9 +30,25 @@ def populate_admin_user():
         return
 
     # Add the first admin user
+    from models.user import User
+    from models.user import UserRoles
+
     first_admin = User('admin', 'admin', 0,
                        user_role=UserRoles.UR_ADMIN, is_text_password=True)
     db_helper.add_item(first_admin)
+
+
+def is_type_valid(value, required_type):
+    """
+    Check if `value` if of type `required_type` or None
+
+    :param value: the value to be tested
+    :param required_type: The accepted type of the variable
+    :return: boolean, True if value if valid, False otherwise
+    """
+
+    return isinstance(value, required_type) or \
+           value is None
 
 
 def remove_none_keys(d):

@@ -14,10 +14,6 @@ bp_songs = Blueprint('songs', __name__)
 
 
 @bp_songs.route('/get_songs')
-@body_sanity_check({
-    'page_number': {'type': 'integer', 'min': 1, 'required': False},
-    'is_filter_explicit': {'type': 'boolean', 'required': False},
-})
 def get_all_songs():
 
     # Process query filters if any
@@ -35,12 +31,7 @@ def get_all_songs():
 
 @bp_songs.route('/add_song', methods=['POST'])
 @parse_user
-@body_sanity_check({
-    'name': {'type': 'string', 'maxlength': 100, 'minlength': 3, 'required': True},
-    'cover_url': {'type': 'string', 'maxlength': 100, 'minlength': 3, 'required': True},
-    'source_url': {'type': 'string', 'maxlength': 100, 'minlength': 3, 'required': True},
-    'is_explicit': {'type': 'boolean', 'required': False}
-})
+@body_sanity_check(['name', 'cover_url', 'source_url'])
 def add_new_song():
 
     # Confirm if the user can add songs
@@ -55,6 +46,9 @@ def add_new_song():
 
     # Create a new song
     new_song = Song(name, cover_url, source_url, is_explicit=is_explicit)
+    if not new_song.is_valid():
+        abort(400, INVALID_SONG_DETAILS)
+
     ret = db_helper.add_item(new_song)
     if ret != SUCCESS:
         abort(400, ret)

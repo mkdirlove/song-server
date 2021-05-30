@@ -1,3 +1,6 @@
+from shared.configs import *
+from shared.utils import is_type_valid
+
 
 class Song:
 
@@ -15,6 +18,32 @@ class Song:
         self.is_explicit = is_explicit
         self.times_played = times_played
         self.num_likes = num_likes
+
+    def is_valid(self):
+
+        # Data types validation
+        is_types_valid = all([
+            is_type_valid(self.song_id, str),
+            is_type_valid(self.name, str),
+            is_type_valid(self.cover_url, str),
+            is_type_valid(self.source_url, str),
+            is_type_valid(self.is_explicit, bool),
+            is_type_valid(self.times_played, int),
+            is_type_valid(self.num_likes, int),
+        ])
+        if not is_types_valid:
+            return False
+
+        # Value validation
+        is_value_valid = all([
+            MIN_SONG_NAME_LEN <= len(self.name) <= MAX_SONG_NAME_LEN,
+            MIN_URL_LENGTH <= len(self.cover_url) <= MAX_URL_LENGTH,
+            MIN_URL_LENGTH <= len(self.source_url) <= MAX_URL_LENGTH,
+            self.times_played >= 0,
+            self.num_likes >= 0
+        ])
+
+        return is_value_valid
 
     @staticmethod
     def from_json(data):

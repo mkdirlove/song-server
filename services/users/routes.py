@@ -5,7 +5,6 @@ from flask import Blueprint
 from flask_jwt_extended import create_access_token
 
 from shared.errorcodes import *
-from shared.configs import *
 from shared.decorators import body_sanity_check
 from shared.decorators import parse_user
 from extensions.dbhelper import db_helper
@@ -51,6 +50,9 @@ def add_new_user():
 
     # Create a new user
     new_user = User(username, password, dob, is_text_password=True)
+    if not new_user.is_valid():
+        abort(400, INVALID_USER_DETAILS)
+
     ret = db_helper.add_item(new_user)
     if ret != SUCCESS:
         # User addition failed

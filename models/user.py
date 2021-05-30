@@ -1,6 +1,9 @@
 from enum import Enum
 from werkzeug.security import generate_password_hash
 
+from shared.configs import *
+from shared.utils import is_type_valid
+
 
 class UserRoles(Enum):
     UR_ADMIN = 1
@@ -16,6 +19,10 @@ class UserRoles(Enum):
     def is_maintenance(self):
         return self == self.UR_MAINTENANCE
 
+    @classmethod
+    def has_value(cls, value):
+        return value in cls._value2member_map_
+
 
 class User:
 
@@ -29,6 +36,7 @@ class User:
         self.user_id = user_id
         self.username = username
         self.password = password
+        self.password_text = password
         self.user_role = self._get_user_role(user_role)
 
         if is_text_password:
@@ -53,9 +61,34 @@ class User:
 
         if isinstance(user_role, UserRoles):
             return user_role
+        
+        # Invalid type input
+        if not isinstance(user_role, int):
+            return UserRoles.UR_USER
+
+        # Input not present in available values
+        if not UserRoles.has_value(user_role):
+            # Default to user
+            user_role = 2
 
         # If user-role value is provided
         return UserRoles(user_role)
+
+    def is_valid(self):
+        is_types_valid = all([
+            is_type_valid(self.user_id, str),
+            is_type_valid(self.username, str),
+            is_type_valid(self.password, str),
+            is_type_valid(self.user_role, UserRoles),
+        ])
+        if not is_types_valid:
+            return False
+
+        is_value_valid = all([
+            MIN_USERNAME_LEN <= len(self.username) <= MAX_USERNAME_LEN,
+            MIN_USERNAME_LEN <= len(self.password_text) <= MAX_USERNAME_LEN,
+        ])
+        return is_value_valid
 
     @staticmethod
     def from_json(data):

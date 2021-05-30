@@ -2,7 +2,6 @@ import time
 import functools
 from flask import abort
 from flask import request
-from cerberus import Validator
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import verify_jwt_in_request
 
@@ -10,16 +9,16 @@ from shared.errorcodes import *
 from models.user import User
 
 
-def body_sanity_check(schema=None):
+def body_sanity_check(keys_list=None):
     """
     A decorator to parse the request body and
     Ensure all required keys are available
 
-    :param schema: A dict representing the body of the request
+    :param keys_list: A list of all required keys in the request body
     """
 
-    if schema is None:
-        schema = {}
+    if keys_list is None:
+        keys_list = []
 
     def decorator(func):
         @functools.wraps(func)
@@ -27,12 +26,11 @@ def body_sanity_check(schema=None):
             body = request.get_json()
 
             # Missing body
-            if body is None and schema is not {}:
+            if body is None and keys_list is not []:
                 abort(400, INVALID_DATA_FORMAT)
 
-            # Cerberus validation
-            validator = Validator()
-            if not validator.validate(body, schema):
+            # Missing key
+            if any([k not in body.keys() for k in keys_list]):
                 abort(400, INVALID_DATA_FORMAT)
 
             return func(*args, **kwargs)
