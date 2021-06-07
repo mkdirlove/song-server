@@ -1,3 +1,10 @@
+import os
+import sys
+
+# Make song_server accessible for tests
+myPath = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, myPath + '/../')
+
 import json
 import pytest
 from pymongo import MongoClient
@@ -51,8 +58,8 @@ def _file_to_json(filepath):
 
 
 # Load test data
-_mongo_client = MongoClient(MONGO_DB_URL)
-_db = _mongo_client[TEST_MONGO_DB_NAME]
+_mongo_client = MongoClient(TestConfig.DB_SOURCE_URL)
+_db = _mongo_client[TestConfig.DB_NAME]
 
 # Drop all existing data
 _db['songs'].drop()

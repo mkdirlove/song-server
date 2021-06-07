@@ -1,7 +1,7 @@
 import pytest
 
-from shared.errorcodes import *
-from shared.utils import remove_none_keys
+from song_server.shared.errorcodes import *
+from song_server.shared.utils import remove_none_keys
 
 
 @pytest.mark.parametrize(
@@ -139,5 +139,5 @@ def test_add_new_user(app, request_username, request_password,
         return
 
     # If a new user was added clean up the user
-    from extensions.dbhelper import db_helper
+    from song_server.extensions.dbhelper import db_helper
     db_helper.remove_user(username)

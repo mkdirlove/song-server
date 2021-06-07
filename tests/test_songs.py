@@ -157,5 +157,5 @@ def test_add_new_song(app, username, password,
         return
 
     # If a new song was added remove it
-    from extensions.dbhelper import db_helper
+    from song_server.extensions.dbhelper import db_helper
     db_helper.remove_song(song_name, source_url)
