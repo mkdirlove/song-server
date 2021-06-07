@@ -23,6 +23,11 @@ from song_server.shared.utils import remove_none_keys
         # Invalid password
         ('admin', '12345', 401, SIGN_IN_FAILURE),
 
+        # Maintenance login
+        ('Patrick Smith', 'password', 201, SUCCESS),
+        ('Patrick Smith', 'wrong-pass', 401, SIGN_IN_FAILURE),
+        ('Patrick A Smith', 'password', 401, SIGN_IN_FAILURE),
+
         # User doesn't exist
         ('random_user', '12345', 401, SIGN_IN_FAILURE),
         # Valid user login
@@ -95,6 +100,10 @@ def test_user_login(app, username, password,
         ('admin', 'admin', 'a', 'b', 400, INVALID_USER_DETAILS),
         ('admin', 'admin', 'abc', 'abc', 400, INVALID_USER_DETAILS),
 
+        # Maintenance users can't add new users
+        ('Patrick Smith', 'password', 'new_user', 'password', 400, PRIVILEGE_ERROR),
+        ('Patrick Smith', 'wrong-password', 'new_user', 'password', 401, SUCCESS),
+
         # Duplicate user
         ('admin', 'admin', 'Donald Lee', 'password', 400, USERNAME_EXISTS),
 
@@ -103,7 +112,7 @@ def test_user_login(app, username, password,
 
         # Invalid request, non-admin trying to add a new user
         ('Barbara Rocha', 'password', 'new_user', 'password', 400, PRIVILEGE_ERROR),
-        ('Barbara Rocha', 'wrong_password', 'new_user', 'password', 401, SUCCESS),
+        ('Barbara Rocha', 'wrong-password', 'new_user', 'password', 401, SUCCESS),
 
         # Invalid data types or invalid length
         ('admin', 'admin', ['item'], 'password', 400, INVALID_USER_DETAILS),

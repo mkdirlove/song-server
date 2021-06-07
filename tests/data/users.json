@@ -19,7 +19,7 @@
   },
   {
     "_id": 3,
-    "user_role": 2,
+    "user_role": 3,
     "username": "Patrick Smith",
     "password": "pbkdf2:sha256:150000$CCGeEwk6$0ad1faecb5ca9aab2c46d7621cffcdfc67d9ec4a01db31de9ff0fe0690d0f96c"
   },
@@ -43,7 +43,7 @@
   },
   {
     "_id": 7,
-    "user_role": 2,
+    "user_role": 3,
     "username": "Teresa Rodriguez",
     "password": "pbkdf2:sha256:150000$CCGeEwk6$0ad1faecb5ca9aab2c46d7621cffcdfc67d9ec4a01db31de9ff0fe0690d0f96c"
   },
