@@ -32,9 +32,9 @@ def user_login():
         abort(400, INVALID_DATA_FORMAT)
 
     # Length checks
-    if 0 >= len(username) >= MAX_USERNAME_LEN:
+    if 0 >= len(username) > MAX_USERNAME_LEN:
         abort(400, SIGN_IN_FAILURE)
-    if 0 >= len(password) >= MAX_PASSWORD_LEN:
+    if 0 >= len(password) > MAX_PASSWORD_LEN:
         abort(400, SIGN_IN_FAILURE)
 
     user = db_helper.login_user(username, password)

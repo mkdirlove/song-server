@@ -6,6 +6,10 @@ from shared.utils import is_type_valid
 
 
 class UserRoles(Enum):
+    """
+    Enum that describes the user roles
+    """
+
     UR_ADMIN = 1
     UR_USER = 2
     UR_MAINTENANCE = 3
@@ -21,6 +25,14 @@ class UserRoles(Enum):
 
     @classmethod
     def has_value(cls, value):
+        """
+        Check if a value is present in user roles
+
+        :param value: the value to be tested
+        :return: boolean, True if the value exists,
+                          False otherwise
+        """
+
         return value in cls._value2member_map_
 
 
