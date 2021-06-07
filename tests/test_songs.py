@@ -92,14 +92,20 @@ def test_get_all_songs(app, songs_data, is_filter_explicit, page_number,
         ('admin', 'admin', 'Whatever put local society same.',
          'www.song_server.com/2192', 'url', None, 201, SUCCESS),
 
-        # Invalid request, non-admin trying to add a new song
+        # Invalid request, user trying to add a new song
         ('Barbara Rocha', 'password', 'new-song',
          'url', 'url', None, 400, PRIVILEGE_ERROR),
         ('Barbara Rocha', 'bad-password', 'new-song',
          'url', 'url', None, 401, SUCCESS),
 
+        # Valid request, maintenance user adding a song
+        ('Patrick Smith', 'password', 'new-song', 'url', 'url', True, 201, SUCCESS),
+        ('Patrick Smith', 'wrong-password', 'new-song', 'url', 'url', True, 401, SUCCESS),
+        ('Teresa Rodriguez', 'password', 'new-song', 'url', 'url', False, 201, SUCCESS),
+
         # Valid request, admin adding a new song
         ('admin', 'admin', 'new-song', 'url', 'url', True, 201, SUCCESS),
+        ('admin', 'wrong-password', 'new-song', 'url', 'url', True, 401, SUCCESS),
         ('admin', 'admin', 'new-song', 'url', 'url', False, 201, SUCCESS),
 
         # Invalid data, either type or value
