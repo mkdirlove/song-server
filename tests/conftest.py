@@ -2,10 +2,10 @@ import json
 import pytest
 from pymongo import MongoClient
 
-from shared.configs import *
-from models.song import Song
-from models.user import User
-from app import create_app
+from song_server.shared.configs import *
+from song_server.models.song import Song
+from song_server.models.user import User
+from song_server.app import create_app
 
 
 """
