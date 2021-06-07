@@ -3,12 +3,12 @@ from flask import request
 from flask import jsonify
 from flask import Blueprint
 
-from shared.errorcodes import *
-from shared.utils import parse_json
-from shared.decorators import body_sanity_check
-from shared.decorators import parse_user
-from extensions.dbhelper import db_helper
-from models.song import Song
+from song_server.shared.errorcodes import *
+from song_server.shared.utils import parse_json
+from song_server.shared.decorators import body_sanity_check
+from song_server.shared.decorators import parse_user
+from song_server.extensions.dbhelper import db_helper
+from song_server.models.song import Song
 
 bp_songs = Blueprint('songs', __name__)
 

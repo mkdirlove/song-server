@@ -1,8 +1,8 @@
 from enum import Enum
 from werkzeug.security import generate_password_hash
 
-from shared.configs import *
-from shared.utils import is_type_valid
+from song_server.shared.configs import *
+from song_server.shared.utils import is_type_valid
 
 
 class UserRoles(Enum):

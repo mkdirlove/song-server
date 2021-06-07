@@ -4,13 +4,13 @@ from flask import jsonify
 from flask import Blueprint
 from flask_jwt_extended import create_access_token
 
-from shared.errorcodes import *
-from shared.configs import *
-from shared.utils import is_type_valid
-from shared.decorators import body_sanity_check
-from shared.decorators import parse_user
-from extensions.dbhelper import db_helper
-from models.user import User
+from song_server.shared.errorcodes import *
+from song_server.shared.configs import *
+from song_server.shared.utils import is_type_valid
+from song_server.shared.decorators import body_sanity_check
+from song_server.shared.decorators import parse_user
+from song_server.extensions.dbhelper import db_helper
+from song_server.models.user import User
 
 
 bp_user = Blueprint('user', __name__)

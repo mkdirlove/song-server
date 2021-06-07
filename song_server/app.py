@@ -1,8 +1,7 @@
 from flask import Flask
 from flask import jsonify
 
-from shared.configs import IS_DEBUG_MODE
-from extensions.extinit import init_extensions
+from song_server.extensions.extinit import init_extensions
 
 
 def create_app(is_testing=False):
@@ -13,8 +12,8 @@ def create_app(is_testing=False):
 
     # Blueprints importing should be done
     # after db init is complete
-    from services.users.routes import bp_user
-    from services.songs.routes import bp_songs
+    from song_server.services.users.routes import bp_user
+    from song_server.services.songs.routes import bp_songs
 
     # Register blueprints
     flask_app.register_blueprint(bp_user)
@@ -30,8 +29,3 @@ def create_app(is_testing=False):
         return jsonify({'code': e.description, 'message': str(e)}), e.code
 
     return flask_app
-
-
-if __name__ == "__main__":
-    app = create_app()
-    app.run(debug=IS_DEBUG_MODE)

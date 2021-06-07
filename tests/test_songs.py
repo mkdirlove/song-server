@@ -1,8 +1,8 @@
 import pytest
 
-from shared.errorcodes import *
-from shared.configs import *
-from shared.utils import remove_none_keys
+from song_server.shared.errorcodes import *
+from song_server.shared.configs import *
+from song_server.shared.utils import remove_none_keys
 
 
 @pytest.mark.parametrize(

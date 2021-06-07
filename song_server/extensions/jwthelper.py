@@ -1,6 +1,6 @@
 from flask_jwt_extended import JWTManager
 
-from shared.utils import get_secret_key
+from song_server.shared.utils import get_secret_key
 
 
 """

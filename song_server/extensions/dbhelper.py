@@ -3,11 +3,11 @@ from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError
 from werkzeug.security import check_password_hash
 
-from shared.configs import *
-from shared.errorcodes import *
-from models.user import User
-from models.song import Song
-from models.user import UserRoles
+from song_server.shared.configs import *
+from song_server.shared.errorcodes import *
+from song_server.models.user import User
+from song_server.models.song import Song
+from song_server.models.user import UserRoles
 
 
 class DbHelper:

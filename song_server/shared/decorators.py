@@ -5,8 +5,8 @@ from flask import request
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import verify_jwt_in_request
 
-from shared.errorcodes import *
-from models.user import User
+from song_server.shared.errorcodes import *
+from song_server.models.user import User
 
 
 def body_sanity_check(keys_list=None):

@@ -24,14 +24,14 @@ def populate_admin_user():
     provided it doesn't already exists
     """
 
-    from extensions.dbhelper import db_helper
+    from song_server.extensions.dbhelper import db_helper
     users = db_helper.get_users(is_admin_only=True)
     if len(users) > 0:
         return
 
     # Add the first admin user
-    from models.user import User
-    from models.user import UserRoles
+    from song_server.models.user import User
+    from song_server.models.user import UserRoles
 
     first_admin = User('admin', 'admin', 0,
                        user_role=UserRoles.UR_ADMIN, is_text_password=True)

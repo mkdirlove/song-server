@@ -1,6 +1,6 @@
-from shared.utils import populate_admin_user
-from extensions.jwthelper import init_jwt_manager
-from extensions.dbhelper import init_db
+from song_server.shared.utils import populate_admin_user
+from song_server.extensions.jwthelper import init_jwt_manager
+from song_server.extensions.dbhelper import init_db
 
 
 def init_extensions(app, is_testing):
