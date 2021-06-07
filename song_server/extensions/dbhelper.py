@@ -79,8 +79,22 @@ class DbHelper:
         )
 
     def remove_song(self, song_name, source_url):
-        self.col_songs.delete_one(
+        ret = self.col_songs.delete_one(
             {'name': song_name, 'source_url': source_url})
+
+        if ret.deleted_count <= 0:
+            return SONG_NOT_FOUND
+
+        return SUCCESS
+
+    def like_song(self, song_id):
+        ret = self.col_songs.update_one(
+            {'_id': song_id}, {'$inc': {'num_likes': 1}})
+        
+        if ret.modified_count <= 0:
+            return SONG_NOT_FOUND
+
+        return SUCCESS
 
     """
     Users Db

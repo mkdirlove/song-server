@@ -156,8 +156,8 @@ def test_add_new_song(app, username, password,
     assert request is not None
     assert request.get_json() is not None
     assert request.status_code == expected_code
-
     request_code = request.get_json().get('code') or 0
+
     assert request_code == return_code
     if request.status_code != 201:
         return
@@ -165,3 +165,45 @@ def test_add_new_song(app, username, password,
     # If a new song was added remove it
     from song_server.extensions.dbhelper import db_helper
     db_helper.remove_song(song_name, source_url)
+
+
+@pytest.mark.parametrize(
+    "username, password, song_id, "
+    "expected_code, return_code",
+    [
+        # Invalid song-id
+        ("admin", "admin", "song-id", 400, SONG_NOT_FOUND),
+
+        # Large song-id
+        ("admin", "admin", "song-id"*100, 400, INVALID_SONG_DETAILS),
+    ]
+)
+def test_like_song(app, username, password, song_id,
+                   expected_code, return_code):
+
+    # Login the user to obtain an access token
+    headers = {'username': username, 'password': password}
+    headers = remove_none_keys(headers)
+    request = app.post('/login', headers=headers)
+
+    assert request is not None
+    assert request.get_json() is not None
+
+    body = request.get_json() or {}
+    access_token = body.get('access_key')
+
+    # Request to add a new song
+    headers = None
+    if access_token is not None:
+        headers = {'Authorization': f'Bearer {access_token}'}
+    body = dict(song_id=song_id)
+    body = remove_none_keys(body)
+    request = app.post('/like_song', json=body, headers=headers)
+
+    # Validate response
+    assert request is not None
+    assert request.get_json() is not None
+    assert request.status_code == expected_code
+
+    request_code = request.get_json().get('code') or 0
+    assert request_code == return_code
