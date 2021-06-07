@@ -1,12 +1,9 @@
-# App Configurations
+import os
 
-# General
-IS_DEBUG_MODE = True
 
-# DB Configs
-MONGO_DB_URL = 'mongodb://localhost:27017'
-MONGO_DB_NAME = 'songs_db'
-DB_ENTRIES_PER_PAGE = 25
+"""
+Default Configurations
+"""
 
 # Songs Configs
 MIN_SONG_NAME_LEN = 5
@@ -25,7 +22,31 @@ NUM_SONGS = 2500
 NUM_USERS = 250
 COMMON_USER_PASSWORD = 'password'
 
+# DB Configs
+DB_ENTRIES_PER_PAGE = 25
+
 # Tests
-TEST_MONGO_DB_NAME = 'songs_db_test'
 DATA_FILE_SONGS = 'data/songs.json'
 DATA_FILE_USERS = 'data/users.json'
+
+
+class DefaultConfig:
+
+    # Flask Configs
+    DEBUG = False
+    TESTING = False
+    SECRET_KEY = os.urandom(24)
+    SESSION_COOKIE_SECURE = True
+
+    # DB Configs
+    DB_SOURCE_URL = 'mongodb://localhost:27017'
+    DB_NAME = 'songs_db'
+
+
+class DevConfig(DefaultConfig):
+    DEBUG = True
+
+
+class TestConfig(DefaultConfig):
+    TESTING = True
+    DB_NAME = 'songs_db_test'

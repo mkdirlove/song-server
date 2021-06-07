@@ -3,7 +3,7 @@ from song_server.extensions.jwthelper import init_jwt_manager
 from song_server.extensions.dbhelper import init_db
 
 
-def init_extensions(app, is_testing):
+def init_extensions(app):
 
     if app is None:
         raise ValueError('Flask app can\'t be None')
@@ -12,7 +12,7 @@ def init_extensions(app, is_testing):
     init_jwt_manager(app)
 
     # Init db
-    init_db(is_testing)
+    init_db(app)
 
     # Init the first admin user
     populate_admin_user()

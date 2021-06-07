@@ -12,12 +12,13 @@ from song_server.models.user import UserRoles
 
 class DbHelper:
 
-    def __init__(self, is_testing=False):
-        self.is_testing = is_testing
+    def __init__(self, flask_app):
 
-        mongo_client = MongoClient(MONGO_DB_URL)
-        db = mongo_client[TEST_MONGO_DB_NAME if is_testing else MONGO_DB_NAME]
+        # Init DB
+        mongo_client = MongoClient(flask_app.config['DB_SOURCE_URL'])
+        db = mongo_client[flask_app.config['DB_NAME']]
 
+        # Collections
         self.col_songs = db['songs']
         self.col_users = db['users']
 
@@ -122,9 +123,9 @@ class DbHelper:
         self.col_songs.drop()
 
 
-def init_db(is_testing=False):
+def init_db(flask_app):
     global db_helper
-    db_helper = DbHelper(is_testing)
+    db_helper = DbHelper(flask_app)
 
 
 db_helper = None
