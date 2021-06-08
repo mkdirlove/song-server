@@ -2,7 +2,7 @@ import os
 
 
 """
-Default Configurations
+Default App Configurations
 """
 
 # Songs Configs
@@ -27,8 +27,13 @@ COMMON_USER_PASSWORD = 'password'
 DB_ENTRIES_PER_PAGE = 25
 
 # Tests
-DATA_FILE_SONGS = 'data/songs.json'
-DATA_FILE_USERS = 'data/users.json'
+DATA_FILE_SONGS = 'tests/data/songs.json'
+DATA_FILE_USERS = 'tests/data/users.json'
+
+
+"""
+Flask Configs
+"""
 
 
 class DefaultConfig:
