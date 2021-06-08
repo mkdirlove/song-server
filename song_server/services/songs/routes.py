@@ -74,3 +74,22 @@ def like_song():
         abort(400, ret)
 
     return jsonify({"message": "Song liked"}), 201
+
+
+@bp_songs.route('/play_song', methods=['POST'])
+@parse_user
+@body_sanity_check(['song_id'])
+def play_song():
+
+    body = request.get_json()
+    song_id = body['song_id']
+
+    if len(song_id) > MAX_SONG_ID_LEN:
+        abort(400, INVALID_SONG_DETAILS)
+
+    # Play the requested song
+    ret = db_helper.play_song(song_id)
+    if ret != SUCCESS:
+        abort(400, ret)
+
+    return jsonify({"message": "Song played"}), 201

@@ -96,6 +96,15 @@ class DbHelper:
 
         return SUCCESS
 
+    def play_song(self, song_id):
+        ret = self.col_songs.update_one(
+            {'_id': song_id}, {'$inc': {'num_played': 1}})
+
+        if ret.modified_count <= 0:
+            return SONG_NOT_FOUND
+
+        return SUCCESS
+
     """
     Users Db
     """
