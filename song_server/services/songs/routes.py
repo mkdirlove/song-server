@@ -66,7 +66,7 @@ def like_song():
     song_id = body['song_id']
 
     if len(song_id) > MAX_SONG_ID_LEN:
-        abort(401, INVALID_SONG_DETAILS)
+        abort(400, INVALID_SONG_DETAILS)
 
     # Like song
     ret = db_helper.like_song(song_id)

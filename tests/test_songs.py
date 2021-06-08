@@ -171,11 +171,22 @@ def test_add_new_song(app, username, password,
     "username, password, song_id, "
     "expected_code, return_code",
     [
-        # Invalid song-id
+        # Invalid user login
+        ("admin", "wrong-pass", "song-id", 401, SUCCESS),
+
+        # Valid login, wrong song-id
         ("admin", "admin", "song-id", 400, SONG_NOT_FOUND),
 
         # Large song-id
         ("admin", "admin", "song-id"*100, 400, INVALID_SONG_DETAILS),
+
+        # Valid login, valid song-id
+        # Admin
+        ("admin", "admin", "5", 201, SUCCESS),
+        # Maintenance
+        ("Patrick Smith", "password", "4", 201, SUCCESS),
+        # User
+        ("Barbara Rocha", "password", "3", 201, SUCCESS),
     ]
 )
 def test_like_song(app, username, password, song_id,
