@@ -9,6 +9,11 @@ from song_server.shared.errorcodes import *
 from song_server.models.user import User
 
 
+"""
+Decorators used throughout the application
+"""
+
+
 def body_sanity_check(keys_list=None):
     """
     A decorator to parse the request body and

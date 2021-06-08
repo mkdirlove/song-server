@@ -6,6 +6,7 @@ from flask import Blueprint
 from song_server.shared.errorcodes import *
 from song_server.shared.configs import *
 from song_server.shared.utils import parse_json
+from song_server.shared.utils import is_type_valid
 from song_server.shared.decorators import body_sanity_check
 from song_server.shared.decorators import parse_user
 from song_server.extensions.dbhelper import db_helper
@@ -14,13 +15,32 @@ from song_server.models.song import Song
 bp_songs = Blueprint('songs', __name__)
 
 
+"""
+Songs Service
+"""
+
+
 @bp_songs.route('/get_songs')
 def get_all_songs():
+    """
+    Return a list of all songs in the db paginated,
+    Request type: GET, body optional
+
+    Body Keys (optional),
+    - is_filter_explicit: bool, False by default, filters explicit songs when True
+    - page_number: int, 1 by default
+    """
 
     # Process query filters if any
     body = request.get_json() or {}
     is_filter_explicit = body.get('is_filter_explicit') or False
     page_number = body.get('page_number') or 1
+
+    # Type checks
+    if not is_type_valid(is_filter_explicit, bool):
+        abort(400, INVALID_DATA_FORMAT)
+    if not is_type_valid(page_number, int):
+        abort(400, INVALID_DATA_FORMAT)
 
     if page_number <= 0:
         abort(400, INVALID_DATA_FORMAT)
@@ -34,6 +54,16 @@ def get_all_songs():
 @parse_user
 @body_sanity_check(['name', 'cover_url', 'source_url'])
 def add_new_song():
+    """
+    Add a new song to the db
+    Request type: POST
+
+    Body Keys,
+    - name: str, name of the new song, required
+    - cover_url: str, song cover url, required
+    - source_url: str, song source url, required
+    - is_explicit: bool, True if song is explicit, False by default, optional
+    """
 
     # Confirm if the user can add songs
     if not add_new_song.user.can_add_songs():
@@ -61,6 +91,13 @@ def add_new_song():
 @parse_user
 @body_sanity_check(['song_id'])
 def like_song():
+    """
+    Like a specific song
+    Request Type: POST
+
+    Body Keys,
+    - song_id: str, id of the song to be liked, required
+    """
 
     body = request.get_json()
     song_id = body['song_id']
@@ -80,6 +117,13 @@ def like_song():
 @parse_user
 @body_sanity_check(['song_id'])
 def play_song():
+    """
+    Play a specific song
+    Request Type: POST
+
+    Body Keys,
+    - song_id: str, id of the song to be played, required
+    """
 
     body = request.get_json()
     song_id = body['song_id']

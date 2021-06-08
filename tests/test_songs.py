@@ -5,6 +5,12 @@ from song_server.shared.configs import *
 from song_server.shared.utils import remove_none_keys
 
 
+"""
+Tests for songs blueprint,
+Located at song_server/services/songs
+"""
+
+
 @pytest.mark.parametrize(
     "is_filter_explicit, page_number, expected_code, return_code",
     [
@@ -23,6 +29,11 @@ from song_server.shared.utils import remove_none_keys
         # is-filter-explicit
         (True, 1, 201, SUCCESS),
         (False, 1, 201, SUCCESS),
+
+        # Invalid data types
+        (100, "wrong-data", 400, INVALID_DATA_FORMAT),
+        (True, "wrong-data", 400, INVALID_DATA_FORMAT),
+        ("wrong-data", 1, 400, INVALID_DATA_FORMAT),
     ]
 )
 def test_get_all_songs(app, songs_data, is_filter_explicit, page_number,

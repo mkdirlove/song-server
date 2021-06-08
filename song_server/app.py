@@ -7,7 +7,7 @@ from song_server.extensions.extinit import init_extensions
 
 def create_app(is_testing=False):
 
-    # Init app
+    # Init Flask app
     flask_app = Flask(__name__)
     flask_app.config.from_object(
         TestConfig if is_testing else DevConfig)

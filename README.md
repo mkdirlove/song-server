@@ -31,6 +31,11 @@ A simple flask song server, depicting how I'd organize a flask project
     git clone https://github.com/agiletelescope/song-server
     cd song-server
     ```
+- Create a virtual env
+    ```
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
 - Install requirements
     ```
     pip3 install -r requirements.txt

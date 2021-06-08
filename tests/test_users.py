@@ -4,6 +4,12 @@ from song_server.shared.errorcodes import *
 from song_server.shared.utils import remove_none_keys
 
 
+"""
+Tests for users blueprint,
+Located at song_server/services/users
+"""
+
+
 @pytest.mark.parametrize(
     "username, password, expected_code, return_code",
     [

@@ -1,4 +1,4 @@
-# List of all error codes the api may return
+# List of all error codes the api returns
 
 SUCCESS = 0
 

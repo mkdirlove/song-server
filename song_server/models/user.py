@@ -23,6 +23,24 @@ class UserRoles(Enum):
     def is_maintenance(self):
         return self == self.UR_MAINTENANCE
 
+    def can_add_user(self):
+        """
+        Privilege check to add a new user
+
+        :return: bool, True if user can to add a new user,
+                       False otherwise
+        """
+        return self == self.UR_ADMIN
+
+    def can_add_song(self):
+        """
+        Privilege check to add a new song
+
+        :return: bool, True if user can to add a new song,
+                       False otherwise
+        """
+        return self in [self.UR_ADMIN, self.UR_MAINTENANCE]
+
     @classmethod
     def has_value(cls, value):
         """
@@ -55,17 +73,10 @@ class User:
             self.password = generate_password_hash(str(self.password))
 
     def can_add_users(self):
-        if self.user_role.is_admin():
-            return True
-
-        return False
+        return self.user_role.can_add_user()
 
     def can_add_songs(self):
-        if self.user_role.is_admin() or \
-                self.user_role.is_maintenance():
-            return True
-
-        return False
+        return self.user_role.can_add_song()
 
     def _get_user_role(self, user_role):
         if user_role is None:

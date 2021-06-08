@@ -16,6 +16,9 @@ from song_server.app import create_app
 
 
 """
+Pytest Config file,
+Houses all initializations and fixtures
+
 Pytest Docs - https://docs.pytest.org/en/6.2.x/
 Pytest Fixtures - https://docs.pytest.org/en/6.2.x/fixture.html
 Pytest Parameterized testing - https://docs.pytest.org/en/6.2.x/example/parametrize.html
@@ -44,7 +47,7 @@ def users_data():
 
 
 """
-Testing Setup
+Db Initialization for tests
 """
 
 

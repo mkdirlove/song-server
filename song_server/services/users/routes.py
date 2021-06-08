@@ -12,12 +12,24 @@ from song_server.shared.decorators import parse_user
 from song_server.extensions.dbhelper import db_helper
 from song_server.models.user import User
 
-
 bp_user = Blueprint('user', __name__)
+
+
+"""
+Users Service
+"""
 
 
 @bp_user.route('/login', methods=['POST'])
 def user_login():
+    """
+    Login a user,
+    Request type: POST
+
+    Header keys,
+    - username: str, name of the user, required
+    - password: str, password of the user unencrypted, required
+    """
 
     headers = request.headers or {}
     username = headers.get('username')
@@ -53,6 +65,14 @@ def user_login():
 @parse_user
 @body_sanity_check(['username', 'password'])
 def add_new_user():
+    """
+    Add a new user,
+    Request type: POST
+
+    Body Keys,
+    - username: str, name of the new user, required
+    - password: str, password of the new user unencrypted, required
+    """
 
     if not add_new_user.user.can_add_users():
         abort(400, PRIVILEGE_ERROR)
