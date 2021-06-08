@@ -47,7 +47,7 @@ class UserRoles(Enum):
         Check if a value is present in user roles
 
         :param value: the value to be tested
-        :return: boolean, True if the value exists,
+        :return: bool, True if the value exists,
                           False otherwise
         """
 
