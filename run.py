@@ -1,5 +1,4 @@
 from song_server.app import create_app
-from song_server.shared.configs import *
 
 
 """

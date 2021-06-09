@@ -26,6 +26,8 @@ A simple flask song server, showing how I'd organize a flask project
 │   ├── data                    Predefined data, used for tests
 │   ├── tests_songs.py          pytest songs service
 │   ├── tests_users.py          pytest users service
+│   ├── dbpopulate.py           Script to populate db for tests
+│   ├── locustfile.py           Locust swarm test
 │   └── conftest.py             pytest init and fixtures definition
 └── run.py                      Callable entry point to run the server
 ```
@@ -52,6 +54,10 @@ A simple flask song server, showing how I'd organize a flask project
 - To run tests
     ```
     pytest -vvs
+    ```
+- Locust load test
+    ```
+    locust -f tests/locustfile.py
     ```
 - Edit application configs
     ```
@@ -89,6 +95,5 @@ SONG_NOT_FOUND = -3003
 
 ##### Todo
 
-- Locust load tests
 - Stats implementation with song rankings etc.
 - Background service for complicated tasks
