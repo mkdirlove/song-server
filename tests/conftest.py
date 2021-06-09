@@ -1,17 +1,13 @@
 import os
 import sys
+import pytest
 
 # Make song_server accessible for tests
-myPath = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, myPath + '/../')
+song_server_dir = os.path.dirname(os.path.abspath(__file__)) + '/../'
+sys.path.insert(0, song_server_dir)
 
-import json
-import pytest
-from pymongo import MongoClient
-
+from tests.dbpopulate import DbPopulate
 from song_server.shared.configs import *
-from song_server.models.song import Song
-from song_server.models.user import User
 from song_server.app import create_app
 
 
@@ -47,35 +43,9 @@ def users_data():
 
 
 """
-Db Initialization for tests
+Pre-Test Setup
 """
 
-
-def _db_dump_data(collection_name, data):
-    _db[collection_name].insert_many(data)
-
-
-def _file_to_json(filepath):
-    with open(filepath) as f:
-        return json.load(f)
-
-
-# Load test data
-_mongo_client = MongoClient(TestConfig.DB_SOURCE_URL)
-_db = _mongo_client[TestConfig.DB_NAME]
-
-# Drop all existing data
-_db['songs'].drop()
-_db['users'].drop()
-
-# Data containers
-_songs = _file_to_json(DATA_FILE_SONGS)
-_users = _file_to_json(DATA_FILE_USERS)
-
-# Repopulate db with test data
-_db_dump_data('songs', _songs)
-_db_dump_data('users', _users)
-
-# Convert json data to model objects
-_songs = [Song.from_json(s) for s in _songs]
-_users = [User.from_json(u) for u in _users]
+# Init Db, Init test data
+db_populate = DbPopulate(TestConfig.DB_SOURCE_URL, TestConfig.DB_NAME)
+_songs, _users = db_populate.load_test_data()
