@@ -6,6 +6,11 @@ A simple flask song server, showing how I'd organize a flask project
 ```
 .
 ├── song_server                 The song-server application
+│   ├── shared                  Modules shared throughout the application
+│   │   ├── configs.py          Application configuraitons
+│   │   ├── decorators.py       Utility decorators
+│   │   ├── utils.py            Utility functions
+│   │   └── errorcodes.py       Error codes returned by application
 │   ├── extensions              Extensions / Plugins handler & initializer
 │   │   ├── dbhelper.py         Mongo db hanlder
 │   │   ├── jwthelper.py        Jwt token initializer
@@ -53,7 +58,8 @@ A simple flask song server, showing how I'd organize a flask project
     vim ./song_server/shared/configs.py
     ```
 
-##### Return Error Codes
+#### Return Error Codes
+
 ```
 SUCCESS = 0
 ```
@@ -83,7 +89,6 @@ SONG_NOT_FOUND = -3003
 
 ##### Todo
 
-- Db Populate scripts
 - Locust load tests
 - Stats implementation with song rankings etc.
 - Background service for complicated tasks

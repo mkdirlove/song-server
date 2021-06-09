@@ -58,7 +58,10 @@ def add_new_song():
     Add a new song to the db
     Request type: POST
 
-    Body Keys,
+    Headers,
+    - access_key: str, the access token, required
+
+    Body,
     - name: str, name of the new song, required
     - cover_url: str, song cover url, required
     - source_url: str, song source url, required
@@ -95,6 +98,9 @@ def like_song():
     Like a specific song
     Request Type: POST
 
+    Headers,
+    - access_key: str, the access token, required
+
     Body Keys,
     - song_id: str, id of the song to be liked, required
     """
@@ -120,6 +126,9 @@ def play_song():
     """
     Play a specific song
     Request Type: POST
+
+    Headers,
+    - access_key: str, the access token, required
 
     Body Keys,
     - song_id: str, id of the song to be played, required

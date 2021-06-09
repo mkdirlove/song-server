@@ -69,6 +69,9 @@ def add_new_user():
     Add a new user,
     Request type: POST
 
+    Headers,
+    - access_key: str, the access token, required
+
     Body Keys,
     - username: str, name of the new user, required
     - password: str, password of the new user unencrypted, required
