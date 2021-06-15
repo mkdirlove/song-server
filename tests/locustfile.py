@@ -43,7 +43,7 @@ Common Tasks
 """
 
 
-def login_user(user):
+def request_login_user(user):
     if not isinstance(user, ClientUser):
         return
 
@@ -57,7 +57,7 @@ def login_user(user):
     return response.json().get('access_key')
 
 
-def get_all_songs(user):
+def request_get_all_songs(user):
     if not isinstance(user, ClientUser):
         return
 
@@ -65,7 +65,7 @@ def get_all_songs(user):
     user.client.get("get_songs", json=body)
 
 
-def like_song(user):
+def request_like_song(user):
     if not isinstance(user, ClientUser):
         return
 
@@ -74,11 +74,25 @@ def like_song(user):
     user.client.post("like_song", json=body, headers=headers)
 
 
-def play_song(user):
+def request_play_song(user):
     if not isinstance(user, ClientUser):
         return
 
     body = {"song_id": "3"}
+    headers = {'Authorization': f'Bearer {user.access_token}'}
+    user.client.post("play_song", json=body, headers=headers)
+
+
+def request_add_new_song(user):
+    if not isinstance(user, ClientUser):
+        return
+
+    body = {
+        "name": f"song-{random.randint(1, 1000)}",
+        "cover_url": f"cover-url-{random.randint(1, 1000)}",
+        "source_url": f"source-url-{random.randint(1, 1000)}",
+        "is_explicit": random.getrandbits(1),
+    }
     headers = {'Authorization': f'Bearer {user.access_token}'}
     user.client.post("play_song", json=body, headers=headers)
 
@@ -89,9 +103,13 @@ Locust Users
 
 
 class ClientUser(locust.HttpUser):
-    weight = 10
-    wait_time = locust.between(0.5, 2)
-    tasks = {play_song: 5, like_song: 1, get_all_songs: 3}
+    weight = 100
+    wait_time = locust.between(2, 5)
+    tasks = {
+        request_play_song: 5,
+        request_like_song: 1,
+        request_get_all_songs: 3
+    }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -102,25 +120,40 @@ class ClientUser(locust.HttpUser):
 
     def on_start(self):
         self.username, self.password = random.choice(g_users)
-        self.access_token = login_user(self)
+        self.access_token = request_login_user(self)
 
 
-# class MaintenanceUser(HttpUser):
-#     weight = 3
-#     wait_time = between(3, 5)
-#
-#     def on_start(self):
-#         random_user = random.choice(CLIENT_USERS)
-#         body = dict(username=random_user[0], password=random_user[1])
-#         self.client.post("/login", json=body)
-#
-#
-# class AdminUser(HttpUser):
-tasks = {like_song: 1}
-#     weight = 1
-#     wait_time = between(5, 10)
-#
-#     def on_start(self):
-#         random_user = random.choice(CLIENT_USERS)
-#         body = dict(username=random_user[0], password=random_user[1])
-#         self.client.post("/login", json=body)
+class MaintenanceUser(locust.HttpUser):
+    weight = 5
+    wait_time = locust.between(15, 30)
+    tasks = {
+        request_add_new_song: 1
+    }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.username = None
+        self.password = None
+        self.access_token = None
+
+    def on_start(self):
+        self.username, self.password = random.choice(g_maintainers)
+        self.access_token = request_login_user(self)
+
+
+class AdminUser(locust.HttpUser):
+    weight = 1
+    wait_time = locust.between(60, 120)
+    tasks = {}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.username = None
+        self.password = None
+        self.access_token = None
+
+    def on_start(self):
+        self.username, self.password = random.choice(g_admins)
+        self.access_token = request_login_user(self)
