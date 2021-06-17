@@ -6,7 +6,7 @@ import pytest
 song_server_dir = os.path.dirname(os.path.abspath(__file__)) + '/../'
 sys.path.insert(0, song_server_dir)
 
-from tests.dbpopulate import DbPopulate
+from tests.db.dbpopulate import DbPopulate
 from song_server.shared.configs import *
 from song_server.app import create_app
 

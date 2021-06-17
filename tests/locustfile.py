@@ -3,7 +3,7 @@ import sys
 import locust
 import random
 
-from tests.dbpopulate import DbPopulate
+from tests.db.dbpopulate import DbPopulate
 
 # Make song_server accessible for swarm tests
 song_server_dir = os.path.dirname(os.path.abspath(__file__)) + '/../'
@@ -91,10 +91,10 @@ def request_add_new_song(user):
         "name": f"song-{random.randint(1, 1000)}",
         "cover_url": f"cover-url-{random.randint(1, 1000)}",
         "source_url": f"source-url-{random.randint(1, 1000)}",
-        "is_explicit": random.getrandbits(1),
+        "is_explicit": bool(random.getrandbits(1))
     }
     headers = {'Authorization': f'Bearer {user.access_token}'}
-    user.client.post("play_song", json=body, headers=headers)
+    user.client.post("add_song", json=body, headers=headers)
 
 
 """
