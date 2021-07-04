@@ -1,6 +1,6 @@
 
 ## song-server
-A simple flask song server, showing how I'd organize a flask project, still in progress.
+A simple flask song server, showing how I'd organize a flask project.
 
 #### Project Structure
 ```
