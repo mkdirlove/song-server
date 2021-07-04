@@ -1,6 +1,6 @@
 
 ## song-server
-A simple flask song server, showing how I'd organize a flask project
+A simple flask song server, showing how I'd organize a flask project, still in progress.
 
 #### Project Structure
 ```
@@ -92,8 +92,3 @@ SONG_EXISTS = -3001
 INVALID_SONG_DETAILS = -3002
 SONG_NOT_FOUND = -3003
 ```
-
-##### Todo
-
-- Stats implementation with song rankings etc.
-- Background service for complicated tasks
